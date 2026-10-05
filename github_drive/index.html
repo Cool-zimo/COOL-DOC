@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GitHub Drive · COOL-DOC</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn">☰</button>
+  <a class="brand" href="../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side">
+    <a class="home" href="../">🏠 返回文档首页</a>
+    <div class="app-t">全部项目</div>
+    <a class="" href="../al/">AnyLearn</a><a class="on" href="../github_drive/">GitHub Drive</a>
+  </nav>
+  <main class="main">
+    <div class="crumb"><a href="../">COOL-DOC</a><span>/</span>GitHub Drive</div>
+    <article class="doc">
+      <h1>GitHub Drive</h1>
+      <p class="lead">用仓库存文件、分片上传、一键分享、插件扩展的虚拟文件系统。</p>
+      <div class="cards"><a class="card" href="../getting-started/"><b>快速开始</b><span>登录、上传、下载基础操作</span><span class="go">阅读 →</span></a><a class="card" href="../user-guide/"><b>完整用户指南</b><span>所有功能详解</span><span class="go">阅读 →</span></a><a class="card" href="../backend/"><b>后端服务</b><span>可选的本地后端，突破跨域限制</span><span class="go">阅读 →</span></a><a class="card" href="../version-switch/"><b>版本切换</b><span>体验他人改进的预览分支</span><span class="go">阅读 →</span></a><a class="card" href="../faq/"><b>常见问题</b><span>FAQ</span><span class="go">阅读 →</span></a><a class="card" href="../plugin-development/"><b>插件开发指南</b><span>如何开发一个插件</span><span class="go">阅读 →</span></a><a class="card" href="../plugin-api/"><b>插件 API 参考</b><span>插件可调用的 API 列表</span><span class="go">阅读 →</span></a><a class="card" href="../contributing/"><b>贡献指南</b><span>提交改进与 CI/CD 流程</span><span class="go">阅读 →</span></a><a class="card" href="../share-format/"><b>分享格式规范</b><span>分享仓库的标准格式</span><span class="go">阅读 →</span></a><a class="card" href="../cangshu-integration/"><b>仓鼠联动</b><span>与配套应用的互通</span><span class="go">阅读 →</span></a><a class="card" href="../changelog/"><b>更新日志</b><span>版本更新记录</span><span class="go">阅读 →</span></a></div>
+    </article>
+  </main>
+</div>
+<footer>COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a></footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){if(e.target.tagName==='A'&&innerWidth<900)close();});
+})();
+</script>
+</body></html>

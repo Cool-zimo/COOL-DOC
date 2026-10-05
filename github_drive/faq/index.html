@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>常见问题 · GitHub Drive · COOL-DOC</title>
+<meta name="description" content="FAQ">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side">
+    <a class="home" href="../../">🏠 返回文档首页</a>
+    <div class="app-t">全部项目</div>
+    <a class="" href="../../al/">AnyLearn</a><a class="on" href="../../github_drive/">GitHub Drive</a>
+    <div class="app-t">本页目录</div><a href="#一般" style="padding-left:10px;font-size:13px">一般</a><a href="#token-安全吗" style="padding-left:24px;font-size:12.5px">Token 安全吗？</a><a href="#换浏览器设备后数据还在吗" style="padding-left:24px;font-size:12.5px">换浏览器/设备后数据还在吗？</a><a href="#大文件有大小限制吗" style="padding-left:24px;font-size:12.5px">大文件有大小限制吗？</a><a href="#分享" style="padding-left:10px;font-size:13px">分享</a><a href="#分享的-mp3视频下载失败" style="padding-left:24px;font-size:12.5px">分享的 mp3/视频下载失败？</a><a href="#分享页面一直显示-loading-files" style="padding-left:24px;font-size:12.5px">分享页面一直显示 &quot;Loading files...&quot;？</a><a href="#分享会占我的仓库额度吗" style="padding-left:24px;font-size:12.5px">分享会占我的仓库额度吗？</a><a href="#插件" style="padding-left:10px;font-size:13px">插件</a><a href="#插件是怎么运行的" style="padding-left:24px;font-size:12.5px">插件是怎么运行的？</a><a href="#为什么我的插件收不到宿主响应" style="padding-left:24px;font-size:12.5px">为什么我的插件收不到宿主响应？</a><a href="#插件能全屏吗" style="padding-left:24px;font-size:12.5px">插件能全屏吗？</a><a href="#第三方插件安全吗" style="padding-left:24px;font-size:12.5px">第三方插件安全吗？</a><a href="#仓鼠联动" style="padding-left:10px;font-size:13px">仓鼠联动</a><a href="#为什么登录一个另一个也进去了" style="padding-left:24px;font-size:12.5px">为什么登录一个，另一个也进去了？</a><a href="#在仓鼠删掉仓库github-上的仓库会没了吗" style="padding-left:24px;font-size:12.5px">在仓鼠删掉仓库，GitHub 上的仓库会没了吗？</a><a href="#仓鼠的配置存在哪" style="padding-left:24px;font-size:12.5px">仓鼠的配置存在哪？</a><a href="#故障排查" style="padding-left:10px;font-size:13px">故障排查</a><a href="#页面白屏或功能异常" style="padding-left:24px;font-size:12.5px">页面白屏或功能异常</a><a href="#上传下载慢" style="padding-left:24px;font-size:12.5px">上传/下载慢</a>
+  </nav>
+  <main class="main">
+    <div class="crumb"><a href="../../">COOL-DOC</a><span>/</span><a href="../../github_drive/">GitHub Drive</a><span>/</span>常见问题</div>
+    <article class="doc">
+      <h1>常见问题</h1>
+      <p class="lead">FAQ</p>
+      <h1>常见问题</h1>
+<h2 id="一般">一般</h2>
+<h3 id="token-安全吗">Token 安全吗？</h3>
+<p>Token 只保存在你的浏览器 <code>localStorage</code>，不会上传到任何服务器。
+建议创建<strong>最小权限</strong>的 Token，只勾选需要的仓库与权限。</p>
+<h3 id="换浏览器设备后数据还在吗">换浏览器/设备后数据还在吗？</h3>
+<ul>
+<li><strong>文件</strong>：存在 GitHub 仓库里，换设备登录即可看到</li>
+<li><strong>分享列表</strong>：直接从你的 GitHub 账号扫描 <code>gd-share-*</code> 仓库，
+不依赖本地记录，换设备照样看得到</li>
+<li><strong>插件</strong>：存在本地 localStorage，换设备需要重新安装</li>
+<li><strong>仓鼠管理列表</strong>：存在私有仓库 <code>cangshu-config</code>，跨设备一致</li>
+</ul>
+<h3 id="大文件有大小限制吗">大文件有大小限制吗？</h3>
+<p>单个文件建议不超过 100MB。超过会自动分片存储到多个仓库。
+GitHub 单仓库建议控制在 1GB 以内。</p>
+<h2 id="分享">分享</h2>
+<h3 id="分享的-mp3视频下载失败">分享的 mp3/视频下载失败？</h3>
+<p>已修复（v0.0.32）。此前合并分片后没带 <code>owner/repo</code>，
+请求打到 <code>/repos/undefined/undefined/...</code> 导致 404。
+<strong>已生成的旧分享页不会自动更新</strong>，需要重新分享一次。</p>
+<h3 id="分享页面一直显示-loading-files">分享页面一直显示 &quot;Loading files...&quot;？</h3>
+<p>已修复（v0.0.33）。生成页的内联脚本有语法错误，
+整段 script 不执行。<strong>重新分享一次</strong>即可。</p>
+<h3 id="分享会占我的仓库额度吗">分享会占我的仓库额度吗？</h3>
+<p>会。分享会创建一个<strong>公开</strong>仓库（如 <code>gd-share-xxx</code>）。
+在「我的分享」里删掉分享会同时删除该仓库。</p>
+<h2 id="插件">插件</h2>
+<h3 id="插件是怎么运行的">插件是怎么运行的？</h3>
+<p>插件是独立的 HTML 文件，在 iframe 沙箱中全屏运行，
+通过 <code>postMessage</code> 与主应用通信，无法直接访问主应用 DOM。</p>
+<h3 id="为什么我的插件收不到宿主响应">为什么我的插件收不到宿主响应？</h3>
+<ol>
+<li>确认 <code>action</code> 名称正确 —— 用 <code>api.listActions</code> 核对</li>
+<li>确认是在 iframe 中运行（直接打开 HTML 文件拿不到响应）</li>
+<li>检查 <code>call()</code> 是否带了超时保护</li>
+<li>多开插件时若用的是老版本封装，可能被覆盖（v0.0.37 已修复）</li>
+</ol>
+<h3 id="插件能全屏吗">插件能全屏吗？</h3>
+<p>自 v0.0.37 起<strong>所有插件都全屏</strong>，不需要额外配置。
+旧的 <code>fullscreen: true</code> 字段保留也不会出错。</p>
+<h3 id="第三方插件安全吗">第三方插件安全吗？</h3>
+<p>第三方插件（<code>GD-Plugin-*</code> 仓库）未经审核，安装时会显示安全警告。
+请自行判断代码是否可信。</p>
+<h2 id="仓鼠联动">仓鼠联动</h2>
+<h3 id="为什么登录一个另一个也进去了">为什么登录一个，另一个也进去了？</h3>
+<p>两个应用同源于 <code>cool-zimo.github.io</code>，<code>localStorage</code> 共享令牌。
+这是刻意设计 —— 登录一次两边都进。</p>
+<h3 id="在仓鼠删掉仓库github-上的仓库会没了吗">在仓鼠删掉仓库，GitHub 上的仓库会没了吗？</h3>
+<p><strong>不会。</strong> 移除只是从管理列表删掉记录，GitHub 仓库本身不受影响。</p>
+<h3 id="仓鼠的配置存在哪">仓鼠的配置存在哪？</h3>
+<p>私有仓库 <code>cangshu-config/cangshu.json</code>。
+所以换设备、换浏览器都能读到。</p>
+<h2 id="故障排查">故障排查</h2>
+<h3 id="页面白屏或功能异常">页面白屏或功能异常</h3>
+<ol>
+<li>强制刷新（Ctrl/Cmd + Shift + R）—— GitHub Pages 有 CDN 缓存</li>
+<li>检查浏览器控制台有无红色报错</li>
+<li>确认 Token 权限是否足够（需要 <code>repo</code>）</li>
+</ol>
+<h3 id="上传下载慢">上传/下载慢</h3>
+<p>GitHub API 有速率限制（每小时 5000 次）。
+大文件分片会消耗较多请求，建议避开高峰时段。</p>
+
+      <div class="pager"><a href="../../version-switch/"><small>← 上一页</small><b>版本切换</b></a><a class="next" href="../../plugin-development/"><small>下一页 →</small><b>插件开发指南</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){
+    var on=s.classList.toggle('on');c.classList.toggle('on',on);
+  };
+  c.onclick=close;
+  s.addEventListener('click',function(e){ if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

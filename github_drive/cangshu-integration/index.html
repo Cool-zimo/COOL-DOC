@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>仓鼠联动 · GitHub Drive · COOL-DOC</title>
+<meta name="description" content="与配套应用的互通">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side">
+    <a class="home" href="../../">🏠 返回文档首页</a>
+    <div class="app-t">全部项目</div>
+    <a class="" href="../../al/">AnyLearn</a><a class="on" href="../../github_drive/">GitHub Drive</a>
+    <div class="app-t">本页目录</div><a href="#为什么能联动" style="padding-left:10px;font-size:13px">为什么能联动</a><a href="#登录互认" style="padding-left:10px;font-size:13px">登录互认</a><a href="#双向切换" style="padding-left:10px;font-size:13px">双向切换</a><a href="#数据存储" style="padding-left:10px;font-size:13px">数据存储</a><a href="#安全" style="padding-left:10px;font-size:13px">安全</a><a href="#插件可用的-api" style="padding-left:10px;font-size:13px">插件可用的 API</a><a href="#配套扩展" style="padding-left:10px;font-size:13px">配套扩展</a>
+  </nav>
+  <main class="main">
+    <div class="crumb"><a href="../../">COOL-DOC</a><span>/</span><a href="../../github_drive/">GitHub Drive</a><span>/</span>仓鼠联动</div>
+    <article class="doc">
+      <h1>仓鼠联动</h1>
+      <p class="lead">与配套应用的互通</p>
+      <h1>仓鼠联动</h1>
+<p>「仓鼠」是配套的 GitHub 仓库管理面板，与 GitHub Drive 深度互通。</p>
+<ul>
+<li>仓鼠：<a href="https://cool-zimo.github.io/cangshu/">https://cool-zimo.github.io/cangshu/</a></li>
+<li>GitHub Drive：<a href="https://cool-zimo.github.io/github_drive/">https://cool-zimo.github.io/github_drive/</a></li>
+</ul>
+<h2 id="为什么能联动">为什么能联动</h2>
+<p>两个应用<strong>同源</strong>：</p>
+<pre><code class="language-text">https://cool-zimo.github.io/github_drive/
+https://cool-zimo.github.io/cangshu/
+</code></pre>
+<p>同 protocol、同 host、同 port → <strong><code>localStorage</code> 天然共享</strong>。</p>
+<p>所以真正的联动不是加个跳转链接，而是 <strong>登录一次，两边都进</strong>。</p>
+<h2 id="登录互认">登录互认</h2>
+<table>
+<thead>
+<tr>
+  <th>你在</th>
+  <th>检测到</th>
+  <th>表现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>仓鼠</td>
+  <td>Drive 已登录</td>
+  <td>登录页出现「沿用该账号，免输入进入」</td>
+</tr>
+<tr>
+  <td>Drive</td>
+  <td>仓鼠已登录</td>
+  <td>同上，反向</td>
+</tr>
+</tbody>
+</table>
+<p>点一下直接进，不用再去翻令牌粘贴。</p>
+<p>任意一边登录成功，令牌会<strong>同步写入两边的存储位置</strong>，
+对面打开就是已登录状态。</p>
+<h2 id="双向切换">双向切换</h2>
+<ul>
+<li>仓鼠顶栏 → 📁 GitHub Drive</li>
+<li>Drive 侧边栏底部 → 🐹 仓鼠</li>
+</ul>
+<p>跳转会带上当前仓库上下文（<code>?repo=owner/repo</code>），
+过去后自动定位并高亮对应卡片。</p>
+<h2 id="数据存储">数据存储</h2>
+<p>仓鼠把管理清单存在<strong>私有仓库 <code>cangshu-config/cangshu.json</code></strong>：</p>
+<pre><code class="language-json"><span class="p">{</span>
+<span class="w">  </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"updatedAt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-09-12T00:00:00Z"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"managed"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"owner"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Cool-zimo"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"repo"</span><span class="p">:</span><span class="w"> </span><span class="s2">"github_drive"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"alias"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"note"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"addedAt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-09-12T00:00:00Z"</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">"settings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"configRepo"</span><span class="p">:</span><span class="w"> </span><span class="s2">"cangshu-config"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"theme"</span><span class="p">:</span><span class="w"> </span><span class="s2">"auto"</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p><strong>为什么存 GitHub 而不是 localStorage</strong>：</p>
+<ul>
+<li>换设备、换浏览器照样读得到</li>
+<li>跨应用共享不依赖同源</li>
+<li>GitHub Drive 的插件也能直接读写（见下文 API）</li>
+</ul>
+<p>写操作会先取文件 <code>sha</code>，遇到 409（并发冲突）自动重试一次。</p>
+<h2 id="安全">安全</h2>
+<ul>
+<li>令牌只存在<strong>你自己的浏览器</strong>，代码里没有任何外发请求</li>
+<li>配置仓库是<strong>私有</strong>的</li>
+<li>建议令牌<strong>只给 <code>cangshu-config</code> 这一个仓库</strong>的 Contents 读写权限</li>
+</ul>
+<h2 id="插件可用的-api">插件可用的 API</h2>
+<p>GitHub Drive 的插件可以直接读写仓鼠配置，详见
+<a href="plugin-api.md#%E4%BB%93%E9%BC%A0%E8%81%94%E5%8A%A8">插件 API 参考 · 仓鼠联动</a>。</p>
+<p>简单的能力探测：</p>
+<pre><code class="language-js"><span class="kd">const</span><span class="w"> </span><span class="nx">actions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">call</span><span class="p">(</span><span class="s1">'api.listActions'</span><span class="p">);</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">actions</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="s1">'cangshu.listRepos'</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">repos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">call</span><span class="p">(</span><span class="s1">'cangshu.listRepos'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">detail</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">});</span>
+<span class="p">}</span>
+</code></pre>
+<h2 id="配套扩展">配套扩展</h2>
+<p>插件市场里的「🐹 仓鼠联动」是完整示例，源码见
+<a href="https://github.com/Cool-zimo/github_drive_plugins/blob/main/plugins/cangshu-link.html">cangshu-link.html</a>。</p>
+
+      <div class="pager"><a href="../../share-format/"><small>← 上一页</small><b>分享格式规范</b></a><a class="next" href="../../changelog/"><small>下一页 →</small><b>更新日志</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){
+    var on=s.classList.toggle('on');c.classList.toggle('on',on);
+  };
+  c.onclick=close;
+  s.addEventListener('click',function(e){ if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>
