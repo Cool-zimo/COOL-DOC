@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hand-written encoders · CoverFit · COOL-DOC</title>
+<meta name="description" content="Why BMP and ICO aren&#x27;t left to the browser — and two binary format traps.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/coverfit/encoders/">中</a><a class="on" href="../../../en/coverfit/encoders/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="" href="../../../al/">AnyLearn</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="on" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../facehub/">FaceHub</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#why-not-just-use-toblob-everywhere" style="padding-left:10px;font-size:13px">Why not just use toBlob everywhere</a><a href="#how-to-tell-whether-the-browser-really-supports-it" style="padding-left:10px;font-size:13px">How to tell whether the browser really supports it</a><a href="#bmp-two-things-to-watch" style="padding-left:10px;font-size:13px">BMP: two things to watch</a><a href="#1-rows-go-bottom-up" style="padding-left:24px;font-size:12.5px">1. Rows go bottom-up</a><a href="#2-rows-must-be-4-byte-aligned" style="padding-left:24px;font-size:12.5px">2. Rows must be 4-byte aligned</a><a href="#channel-order-is-bgra" style="padding-left:24px;font-size:12.5px">Channel order is BGRA</a><a href="#ico-embed-a-png" style="padding-left:10px;font-size:13px">ICO: embed a PNG</a><a href="#transparent-areas-turn-white-in-jpeg" style="padding-left:10px;font-size:13px">Transparent areas turn white in JPEG</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">CoverFit</a><span>/</span>Hand-written encoders</div>
+    <article class="doc">
+      <h1>Hand-written encoders</h1>
+      <p class="lead">Why BMP and ICO aren&#x27;t left to the browser — and two binary format traps.</p>
+      <h2 id="why-not-just-use-toblob-everywhere">Why not just use toBlob everywhere</h2>
+<p><code>canvas.toBlob()</code> handles PNG / JPEG / WebP, but:</p>
+<ul>
+<li><strong>BMP</strong> — only some browsers support it (Firefox doesn't)</li>
+<li><strong>ICO</strong> — <strong>no browser supports it</strong></li>
+</ul>
+<p>Worse: <strong>failure is silent</strong>. The call succeeds, but hands you a PNG wearing an <code>.ico</code>
+filename — the user downloads something that won't open and has no idea why.</p>
+<p>So both formats are encoded here by hand.</p>
+<h2 id="how-to-tell-whether-the-browser-really-supports-it">How to tell whether the browser really supports it</h2>
+<p>Don't sniff the UA (unreliable) — <strong>actually encode once</strong>:</p>
+<pre><code class="language-js"><span class="kd">function</span><span class="w"> </span><span class="nx">probe</span><span class="p">(</span><span class="nx">mime</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// encode a 1x1 canvas and check the returned blob.type</span>
+<span class="p">}</span>
+</code></pre>
+<p>When unsupported, <code>toBlob</code> silently degrades to PNG, so checking &quot;did it return
+anything&quot; tells you nothing — you must read the returned <code>type</code>. Formats the current
+browser can't do are <strong>disabled with an explanation</strong>.</p>
+<h2 id="bmp-two-things-to-watch">BMP: two things to watch</h2>
+<h3 id="1-rows-go-bottom-up">1. Rows go bottom-up</h3>
+<pre><code class="language-js"><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">let</span><span class="w"> </span><span class="nx">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">h</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1</span><span class="p">;</span><span class="w"> </span><span class="nx">y</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span><span class="w"> </span><span class="nx">y</span><span class="o">--</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">    </span><span class="c1">// start from the last row</span>
+</code></pre>
+<p>A positive <code>biHeight</code> in BMP means <strong>bottom-up</strong> (the first row of data is actually the
+bottom row of the image). Get it wrong and the image flips vertically — and most viewers
+won't complain, it'll just be upside down.</p>
+<h3 id="2-rows-must-be-4-byte-aligned">2. Rows must be 4-byte aligned</h3>
+<pre><code class="language-js"><span class="kd">const</span><span class="w"> </span><span class="nx">rowSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">((</span><span class="nx">w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">32</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">31</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">32</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">4</span><span class="p">;</span><span class="w">   </span><span class="c1">// 4-byte alignment</span>
+<span class="p">...</span>
+<span class="nx">off</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="nx">rowSize</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">4</span><span class="p">;</span><span class="w">                                </span><span class="c1">// row padding</span>
+</code></pre>
+<p>At 32bpp each row's byte count is naturally a multiple of 4, so padding is zero.
+But <strong>keep this logic</strong> — switch to 24bpp (3 bytes/pixel) and any width that isn't a
+multiple of 4 shifts the rows, skewing the whole image.</p>
+<h3 id="channel-order-is-bgra">Channel order is BGRA</h3>
+<pre><code class="language-js"><span class="nx">u8</span><span class="p">[</span><span class="nx">off</span><span class="p">]</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="nx">src</span><span class="p">[</span><span class="nx">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">2</span><span class="p">];</span><span class="w">   </span><span class="c1">// B</span>
+<span class="nx">u8</span><span class="p">[</span><span class="nx">off</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">src</span><span class="p">[</span><span class="nx">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">1</span><span class="p">];</span><span class="w">   </span><span class="c1">// G</span>
+<span class="nx">u8</span><span class="p">[</span><span class="nx">off</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">src</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span><span class="w">       </span><span class="c1">// R</span>
+<span class="nx">u8</span><span class="p">[</span><span class="nx">off</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">src</span><span class="p">[</span><span class="nx">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">3</span><span class="p">];</span><span class="w">   </span><span class="c1">// A</span>
+</code></pre>
+<p>Canvas gives RGBA; BMP wants BGRA. Get it wrong and colours swap (red↔blue).</p>
+<h2 id="ico-embed-a-png">ICO: embed a PNG</h2>
+<p>ICO doesn't have to store a BMP — <strong>PNG embedding has been supported since Vista</strong> and
+works on macOS / Windows / Linux. Far smaller, and it avoids writing palette logic.</p>
+<pre><code class="language-js"><span class="kd">const</span><span class="w"> </span><span class="nx">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span><span class="w"> </span><span class="nx">h</span><span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">n</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mf">256</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">n</span><span class="p">;</span><span class="w">      </span><span class="c1">// 256 is recorded as 0</span>
+</code></pre>
+<div class="tip tip-warn">
+<b>Shrink anything over 256</b>
+<p>ICO width/height fields are single bytes, with 256 written as 0. Many parsers reject
+anything larger outright. So big images are scaled to 256 first.</p>
+</div>
+
+<p>Three sections total:</p>
+<pre><code class="language-text"><span class="nx">ICONDIR</span><span class="w">       </span><span class="mi">6</span><span class="w"> </span><span class="nx">bytes</span><span class="w">   </span><span class="nx">reserved</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="k">type</span><span class="p">=</span><span class="mi">1</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nx">count</span><span class="p">=</span><span class="mi">1</span>
+<span class="nx">ICONDIRENTRY</span><span class="w"> </span><span class="mi">16</span><span class="w"> </span><span class="nx">bytes</span><span class="w">   </span><span class="nx">width</span><span class="o">/</span><span class="nx">height</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nx">bpp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="nx">length</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nx">offset</span>
+<span class="nx">PNG</span><span class="w"> </span><span class="nx">data</span><span class="w">      </span><span class="nx">from</span><span class="w"> </span><span class="nx">offset</span><span class="w"> </span><span class="mi">22</span><span class="w"> </span><span class="nx">onward</span>
+</code></pre>
+<pre><code class="language-js"><span class="nx">view</span><span class="p">.</span><span class="nx">setUint32</span><span class="p">(</span><span class="mf">18</span><span class="p">,</span><span class="w"> </span><span class="mf">22</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span><span class="w">     </span><span class="c1">// imageOffset = 6 + 16</span>
+<span class="nx">u8</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">pngBytes</span><span class="p">,</span><span class="w"> </span><span class="mf">22</span><span class="p">);</span>
+</code></pre>
+<h2 id="transparent-areas-turn-white-in-jpeg">Transparent areas turn white in JPEG</h2>
+<p>JPEG has no alpha channel. Canvas usually writes transparent pixels as RGB 0 (black),
+so saving directly gives you a black background.</p>
+<p>CoverFit <strong>fills transparency with white</strong> before encoding:</p>
+<pre><code class="language-text">what actually gets written is 255,255,255
+</code></pre>
+<p>That matches expectations — printed, or pasted onto a white document, you want white.</p>
+
+      <div class="pager"><a href="../under-the-hood/"><small>← Previous</small><b>Under the hood</b></a><a style="visibility:hidden"></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>API 与缓存 · FaceHub · COOL-DOC</title>
+<meta name="description" content="REST 封装、缓存失效，以及一个只清一半就会出 bug 的地方。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/facehub/api-cache/">中</a><a class="" href="../../../en/facehub/api-cache/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="" href="../../../al/">AnyLearn · 通学万义</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="on" href="../../../facehub/">FaceHub</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#为什么要缓存" style="padding-left:10px;font-size:13px">为什么要缓存</a><a href="#四个缓存-key-必须一起清" style="padding-left:10px;font-size:13px">四个缓存 key 必须一起清</a><a href="#大文件走-blob-api" style="padding-left:10px;font-size:13px">大文件走 blob API</a><a href="#消息是-issue-comment" style="padding-left:10px;font-size:13px">消息是 Issue comment</a><a href="#密钥存储" style="padding-left:10px;font-size:13px">密钥存储</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">FaceHub</a><span>/</span>API 与缓存</div>
+    <article class="doc">
+      <h1>API 与缓存</h1>
+      <p class="lead">REST 封装、缓存失效，以及一个只清一半就会出 bug 的地方。</p>
+      <p><code>js/api.js</code> 封装 GitHub REST，并在 localStorage 上做了一层缓存。</p>
+<h2 id="为什么要缓存">为什么要缓存</h2>
+<p>GitHub 未认证 API 只有 60 次/小时，登录后才 5000 次。
+聊天应用要频繁拉消息，不打缓存很快见底。</p>
+<h2 id="四个缓存-key-必须一起清">四个缓存 key 必须一起清</h2>
+<p>这是最容易写错的地方：</p>
+<pre><code class="language-js"><span class="c1">// writeFile 末尾</span>
+<span class="k">this</span><span class="p">.</span><span class="nx">_ls</span><span class="p">(</span><span class="s1">'fh:etag:'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">owner</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">'/'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">repo</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span><span class="w">              </span><span class="c1">// 目录 ETag</span>
+<span class="k">this</span><span class="p">.</span><span class="nx">_ls</span><span class="p">(</span><span class="s1">'fh:c:'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">owner</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">'/'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">repo</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">'/'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">path</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span><span class="w">    </span><span class="c1">// 内容（文本）</span>
+<span class="k">this</span><span class="p">.</span><span class="nx">_ls</span><span class="p">(</span><span class="s1">'fh:c:'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">owner</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">'/'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">repo</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">'/'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">path</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">'|b64'</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span><span class="w"> </span><span class="c1">// 内容（base64）</span>
+<span class="k">this</span><span class="p">.</span><span class="nx">_ls</span><span class="p">(</span><span class="s1">'fh:e:'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">owner</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">'/'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">repo</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">'/'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">path</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span><span class="w">    </span><span class="c1">// 文件 ETag</span>
+</code></pre>
+<div class="tip tip-bad">
+<b>只清第一个会出 bug</b>
+<p>写完立刻读，拿到的是<b>旧值</b> —— 因为内容缓存还留着。
+表现为"消息发出去了但看不到"，而且没有任何报错。</p>
+</div>
+
+<p>四条都清是因为：同一个文件既可能以文本被读、也可能以 base64 被读（图片附件），
+两种形态各有一份缓存，加上目录级和文件级的两个 ETag。</p>
+<h2 id="大文件走-blob-api">大文件走 blob API</h2>
+<pre><code class="language-js"><span class="nx">readLargeFile</span><span class="p">()</span><span class="w">   </span><span class="c1">// /git/blobs/{sha}</span>
+</code></pre>
+<p>contents API 对单个文件有 <strong>1MB 限制</strong>，超过就读不到。
+大附件必须走 blob API。</p>
+<h2 id="消息是-issue-comment">消息是 Issue comment</h2>
+<p>FaceHub 没有自己的服务器，消息存在 <strong>GitHub Issue 的 comment</strong> 里：</p>
+<table>
+<thead>
+<tr>
+  <th>方法</th>
+  <th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>messages(owner, repo, issueNumber, since)</code></td>
+  <td>增量拉，<code>since</code> 传时间戳</td>
+</tr>
+<tr>
+  <td><code>sendMessage</code></td>
+  <td>发一条</td>
+</tr>
+<tr>
+  <td><code>deleteMessage</code></td>
+  <td>删 comment</td>
+</tr>
+<tr>
+  <td><code>clearMessages</code></td>
+  <td>批量清空（带进度回调）</td>
+</tr>
+</tbody>
+</table>
+<p><code>since</code> 是性能关键 —— 每次只拉新的，不重拉全部历史。</p>
+<h2 id="密钥存储">密钥存储</h2>
+<pre><code class="language-text">localStorage
+├── fh:id:{login}          身份密钥（丢了全解不开）
+└── fh:sk:{login}/{room}   会话密钥（旧式，兼容）
+</code></pre>
+<p>导出的是 v2 格式，带版本号：</p>
+<pre><code class="language-jsonc">{
+  "v": 2,
+  "type": "facehub-keys",
+  "identities": { "cool-zimo": { "priv": "...", "pub": "..." } },
+  "rooms": { ... },
+  "exportedAt": "..."
+}
+</code></pre>
+<div class="tip tip-warn">
+<b>备份是明文的</b>
+<p>不加口令加密是刻意的：会引入"忘了口令更惨"这个新问题。
+两害相权，宁可让你自己看好文件。界面上有明确提示。</p>
+</div>
+
+
+      <div class="pager"><a href="../crypto/"><small>← 上一页</small><b>加密机制</b></a><a style="visibility:hidden"></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

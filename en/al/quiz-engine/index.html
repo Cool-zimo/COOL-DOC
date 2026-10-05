@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Grading engine · AnyLearn · COOL-DOC</title>
+<meta name="description" content="How questions are parsed and graded — and why some traps must be avoided.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/al/quiz-engine/">中</a><a class="on" href="../../../en/al/quiz-engine/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="on" href="../../../al/">AnyLearn</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../facehub/">FaceHub</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#argument-splitting-bracket-aware" style="padding-left:10px;font-size:13px">Argument splitting: bracket-aware</a><a href="#a-counter-intuitive-decision-commas-only-never-spaces" style="padding-left:10px;font-size:13px">A counter-intuitive decision: commas only, never spaces</a><a href="#literal-conversion" style="padding-left:10px;font-size:13px">Literal conversion</a><a href="#random-result-questions-range-alone-isnt-enough" style="padding-left:10px;font-size:13px">Random-result questions: range alone isn&#x27;t enough</a><a href="#program-questions-expose-output-as-a-variable" style="padding-left:10px;font-size:13px">Program questions: expose output as a variable</a><a href="#web-questions-grade-inside-an-iframe" style="padding-left:10px;font-size:13px">Web questions grade inside an iframe</a><a href="#local-and-project-are-self-assessed" style="padding-left:10px;font-size:13px">local and project are self-assessed</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">AnyLearn</a><span>/</span>Grading engine</div>
+    <article class="doc">
+      <h1>Grading engine</h1>
+      <p class="lead">How questions are parsed and graded — and why some traps must be avoided.</p>
+      <p>The grading engine lives in <code>js/quiz.js</code>. Its job: parse a fenced block into a question
+object → render it as something interactive → collect the answer → grade → write
+progress.</p>
+<h2 id="argument-splitting-bracket-aware">Argument splitting: bracket-aware</h2>
+<p>Function question cases look like this:</p>
+<pre><code class="language-text"><span class="n">cases</span><span class="o">:</span><span class="w"> </span><span class="o">|</span>
+<span class="w">  </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">]</span>
+<span class="w">  </span><span class="s">"a,b"</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s">"b,a"</span>
+</code></pre>
+<p>Splitting arguments on commas is unavoidable — but it <strong>must not split inside
+brackets</strong>.</p>
+<pre><code class="language-js"><span class="kd">function</span><span class="w"> </span><span class="nx">splitArgs</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[];</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nx">depth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="nx">cur</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">''</span><span class="p">;</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">ch</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nb">String</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">ch</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'['</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">ch</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'('</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">ch</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'{'</span><span class="p">)</span><span class="w"> </span><span class="nx">depth</span><span class="o">++</span><span class="p">;</span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">ch</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">']'</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">ch</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">')'</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">ch</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'}'</span><span class="p">)</span><span class="w"> </span><span class="nx">depth</span><span class="o">--</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">ch</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">','</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">depth</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="mf">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">out</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">cur</span><span class="p">.</span><span class="nx">trim</span><span class="p">());</span><span class="w"> </span><span class="nx">cur</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">''</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="nx">cur</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="nx">ch</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">cur</span><span class="p">.</span><span class="nx">trim</span><span class="p">())</span><span class="w"> </span><span class="nx">out</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">cur</span><span class="p">.</span><span class="nx">trim</span><span class="p">());</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">out</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+<p>Without this, <code>[1,2,3]</code> would be cut into <code>[&quot;[1&quot;, &quot;2&quot;, &quot;3]&quot;]</code>.</p>
+<h2 id="a-counter-intuitive-decision-commas-only-never-spaces">A counter-intuitive decision: commas only, never spaces</h2>
+<p>At one point an author (myself, writing a template) casually wrote <code>1 2 -&gt; 3</code>.
+The result: <code>add(&quot;1 2&quot;)</code> got called and threw &quot;missing argument b&quot;.</p>
+<p><strong>Why not just also split on spaces</strong>: that would break <code>&quot;hello world&quot; -&gt; 5</code> — a single
+string argument containing a space. Every space-containing string would break.</p>
+<p>It's a trade-off. Current handling has three layers:</p>
+<ol>
+<li>Every official template uses commas</li>
+<li>The validator rejects case lines that contain spaces but no commas and aren't
+wrapped in quotes or brackets</li>
+<li>The editor preview flags it inline, before publishing</li>
+</ol>
+<h2 id="literal-conversion">Literal conversion</h2>
+<p>Cases are written as Python literals and must become JS values:</p>
+<pre><code class="language-js"><span class="kd">function</span><span class="w"> </span><span class="nx">literal</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="sr">/^-?\d+$/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span><span class="w"> </span><span class="mf">10</span><span class="p">);</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'True'</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'None'</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'true'</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w">      </span><span class="c1">// JS questions use lowercase</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="sr">/^".*"$/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nx">s</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">1</span><span class="p">);</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="sr">/^[[{]/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/'/g</span><span class="p">,</span><span class="w"> </span><span class="s1">'"'</span><span class="p">));</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">e</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">s</span><span class="p">);</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">e2</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">s</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+<p>Both boolean spellings must be accepted — Python questions write <code>True</code>, JavaScript
+ones write <code>true</code>.</p>
+<h2 id="random-result-questions-range-alone-isnt-enough">Random-result questions: range alone isn't enough</h2>
+<p>A dice-roll function returns something different every call, so exact comparison is
+impossible. Two pieces of syntax handle it:</p>
+<pre><code class="language-text"><span class="o">*</span><span class="mi">20</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mf">1..6</span><span class="w">       </span><span class="n">call</span><span class="w"> </span><span class="mi">20</span><span class="w"> </span><span class="n">times</span><span class="p">,</span><span class="w"> </span><span class="n">every</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="n">must</span><span class="w"> </span><span class="n">land</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="mf">1..6</span>
+</code></pre>
+<p>But <strong>range checks stop out-of-bounds, not fake randomness</strong>:</p>
+<pre><code class="language-python"><span class="k">def</span><span class="w"> </span><span class="nf">roll</span><span class="p">():</span> <span class="k">return</span> <span class="mi">3</span>      <span class="c1"># always in 1..6, but it isn't random at all</span>
+</code></pre>
+<p>So range cases also verify that <strong>multiple distinct values actually appeared</strong>:</p>
+<pre><code class="language-python"><span class="n">__is_int</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lo</span><span class="p">)</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span> <span class="ow">and</span> <span class="nb">float</span><span class="p">(</span><span class="n">hi</span><span class="p">)</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span>
+<span class="n">__span</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hi</span><span class="p">)</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">lo</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">__is_int</span> <span class="k">else</span> <span class="mi">0</span>
+<span class="k">if</span> <span class="n">__is_int</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">__span</span> <span class="o">&lt;=</span> <span class="mi">10</span><span class="p">:</span>
+    <span class="n">__need</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">lo</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">hi</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">__enough</span> <span class="o">=</span> <span class="n">__need</span><span class="o">.</span><span class="n">issubset</span><span class="p">({</span><span class="nb">int</span><span class="p">(</span><span class="n">__x</span><span class="p">)</span> <span class="k">for</span> <span class="n">__x</span> <span class="ow">in</span> <span class="n">__vals</span> <span class="k">if</span> <span class="n">__in_range</span><span class="p">(</span><span class="n">__x</span><span class="p">,</span> <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span><span class="p">)})</span>
+    <span class="c1"># dice-like: every integer must appear</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">__enough</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">__distinct</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">repeat</span><span class="p">)</span>
+    <span class="c1"># floats or wide ranges: at least 5 distinct values</span>
+</code></pre>
+<p>Integer ranges with span ≤ 10 (dice, coins) require <strong>every value to appear</strong>; otherwise
+(floats, wide ranges) at least 5 distinct values.</p>
+<p>Without this, <code>return 3</code> passes every test.</p>
+<h2 id="program-questions-expose-output-as-a-variable">Program questions: expose output as a variable</h2>
+<p>These grade &quot;what did you print&quot;, not &quot;what did you return&quot;. stdout is captured and
+pushed into a variable named <code>__out</code>:</p>
+<pre><code class="language-js"><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">ns</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'__out'</span><span class="p">,</span><span class="w"> </span><span class="nx">buf</span><span class="p">);</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* some proxies don't support set */</span><span class="w"> </span><span class="p">}</span>
+</code></pre>
+<p>So tests can be written as:</p>
+<pre><code class="language-python"><span class="k">assert</span> <span class="s2">"hello"</span> <span class="ow">in</span> <span class="n">__out</span>
+</code></pre>
+<h2 id="web-questions-grade-inside-an-iframe">Web questions grade inside an iframe</h2>
+<p>HTML / CSS / JS questions go through <code>web-runner.js</code>: the user's code is assembled into
+a full document, loaded into an <code>&lt;iframe&gt;</code>, and checks run in that <strong>isolated context</strong>.</p>
+<p>Some checks can <strong>never</strong> pass — avoid them when authoring:</p>
+<ul>
+<li><code>:hover</code> pseudo-class — JS can't trigger a real mouse hover</li>
+<li><code>getComputedStyle</code> reading <code>height: auto</code> — resolves to a pixel value, never <code>auto</code></li>
+<li>default font size of <code>&lt;button&gt;</code> — inconsistent across browsers (Chrome: 13.333px)</li>
+</ul>
+<h2 id="local-and-project-are-self-assessed"><code>local</code> and <code>project</code> are self-assessed</h2>
+<p>These two types have <strong>no automatic grading</strong> (a browser can't verify &quot;did you actually
+run this locally&quot;). They render as a checklist the learner ticks and confirms.</p>
+<p>The validator counts them toward question totals but <strong>never inspects the checklist
+contents</strong> — that's inherently subjective.</p>
+
+      <div class="pager"><a href="../architecture/"><small>← Previous</small><b>Architecture</b></a><a class="next" href="../code-runner/"><small>Next →</small><b>Code execution sandbox</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

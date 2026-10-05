@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>虚拟文件系统 · GitHub Drive · COOL-DOC</title>
+<meta name="description" content="多个仓库怎么合成一个硬盘，路径怎么映射。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/github_drive/architecture/">中</a><a class="" href="../../../en/github_drive/architecture/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="" href="../../../al/">AnyLearn · 通学万义</a><a class="on" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../facehub/">FaceHub</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#路径映射" style="padding-left:10px;font-size:13px">路径映射</a><a href="#为什么文件不直接放在仓库根目录" style="padding-left:10px;font-size:13px">为什么文件不直接放在仓库根目录</a><a href="#一个文件跨多个仓库" style="padding-left:10px;font-size:13px">一个文件跨多个仓库</a><a href="#仓库容量追踪" style="padding-left:10px;font-size:13px">仓库容量追踪</a><a href="#分片后的元数据" style="padding-left:10px;font-size:13px">分片后的元数据</a><a href="#上传失败要回滚" style="padding-left:10px;font-size:13px">上传失败要回滚</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">GitHub Drive</a><span>/</span>虚拟文件系统</div>
+    <article class="doc">
+      <h1>虚拟文件系统</h1>
+      <p class="lead">多个仓库怎么合成一个硬盘，路径怎么映射。</p>
+      <p>GitHub Drive 的核心是一个<strong>虚拟文件系统</strong>：你看到的是一个统一的目录树，
+实际上文件分散在好几个 GitHub 仓库里。</p>
+<h2 id="路径映射">路径映射</h2>
+<pre><code class="language-text">/drive_home/文档/报告.pdf
+     ↓
+{ owner: 'Cool-zimo', repo: 'drive-storage-1',
+  path: 'a1b2c3/报告.pdf' }
+</code></pre>
+<p>界面上显示的是虚拟路径，底层真实路径带一个<strong>时间戳前缀目录</strong>：</p>
+<pre><code class="language-js"><span class="kd">const</span><span class="w"> </span><span class="nx">chunkPath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">().</span><span class="nx">toString</span><span class="p">(</span><span class="mf">36</span><span class="p">)</span><span class="si">}</span><span class="sb">/</span><span class="si">${</span><span class="nx">chunkFileName</span><span class="si">}</span><span class="sb">`</span><span class="p">;</span>
+</code></pre>
+<p>用 <code>toString(36)</code> 是为了短 —— 同一个目录下不会撞名，也方便按时间排序。</p>
+<h2 id="为什么文件不直接放在仓库根目录">为什么文件不直接放在仓库根目录</h2>
+<p>仓库根目录会被 README、配置文件之类的东西占。
+用一层时间戳目录隔开，虚拟文件和真实文件不会混在一起。</p>
+<h2 id="一个文件跨多个仓库">一个文件跨多个仓库</h2>
+<p>大文件会被切成分片，每个分片<strong>独立选仓库</strong>：</p>
+<pre><code class="language-js"><span class="kd">const</span><span class="w"> </span><span class="nx">repo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">autoSelectRepo</span><span class="p">(</span><span class="nx">chunkSizeActual</span><span class="p">);</span>
+</code></pre>
+<p>所以&quot;一个文件&quot;在物理上可能横跨三个仓库。下载时按记录的顺序读回来拼起来。</p>
+<h2 id="仓库容量追踪">仓库容量追踪</h2>
+<pre><code class="language-text">maxRepoSize    900MB   单仓库上限
+warnThreshold  0.8     用到 80% 就警告
+autoCreateRepo true    不够了自动建新仓库
+repoNamePrefix drive-storage
+</code></pre>
+<p><code>getRepoUsage()</code> 记录每个仓库用了多少，<code>autoSelectRepo()</code> 挑一个还放得下的。</p>
+<div class="tip tip-note">
+<b>容量是本地估算，不是实时查询</b>
+<p>每上传一个分片就 <code>addToRepoUsage()</code> 累加。想校准可以跑
+<code>syncAllRepoUsage()</code>，那会真的去查每个仓库的实际大小 ——
+但要点时间，所以是手动触发的。</p>
+</div>
+
+<h2 id="分片后的元数据">分片后的元数据</h2>
+<pre><code class="language-text">file: {
+  name, size, chunks: [
+    { owner, repo, path, size, sha },
+    ...
+  ]
+}
+</code></pre>
+<p><code>sha</code> 必须记下来 —— 删除文件时 GitHub 的 contents API <strong>要求提供 sha</strong>，
+没有就删不掉。</p>
+<h2 id="上传失败要回滚">上传失败要回滚</h2>
+<p>分片上传是逐个来的，中途挂了会留下一堆孤儿分片：</p>
+<pre><code class="language-js"><span class="nx">console</span><span class="p">.</span><span class="nx">warn</span><span class="p">(</span><span class="sb">`[FileManager] 上传失败，正在清理 </span><span class="si">${</span><span class="nx">chunks</span><span class="p">.</span><span class="nx">length</span><span class="si">}</span><span class="sb"> 个已上传分片...`</span><span class="p">);</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">chunk</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">chunks</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">chunk</span><span class="p">.</span><span class="nx">sha</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">deleteFile</span><span class="p">(...,</span><span class="w"> </span><span class="nx">chunk</span><span class="p">.</span><span class="nx">sha</span><span class="p">);</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">storage</span><span class="p">.</span><span class="nx">subtractFromRepoUsage</span><span class="o">?</span><span class="p">.(...);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p>不清的话，仓库里会越积越多没人认领的碎片，还会虚占容量。</p>
+
+      <div class="pager"><a href="../faq/"><small>← 上一页</small><b>常见问题</b></a><a class="next" href="../storage-internals/"><small>下一页 →</small><b>分片与容量</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

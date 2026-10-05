@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>代码执行沙箱 · AnyLearn · 通学万义 · COOL-DOC</title>
+<meta name="description" content="Pyodide 怎么加载、命名空间怎么隔离、输出怎么捕获。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/al/code-runner/">中</a><a class="" href="../../../en/al/code-runner/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="on" href="../../../al/">AnyLearn · 通学万义</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../facehub/">FaceHub</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#加载" style="padding-left:10px;font-size:13px">加载</a><a href="#命名空间隔离" style="padding-left:10px;font-size:13px">命名空间隔离</a><a href="#输出捕获" style="padding-left:10px;font-size:13px">输出捕获</a><a href="#stdin-也要接管" style="padding-left:10px;font-size:13px">stdin 也要接管</a><a href="#返回值怎么拿" style="padding-left:10px;font-size:13px">返回值怎么拿</a><a href="#为什么会失败" style="padding-left:10px;font-size:13px">为什么会失败</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">AnyLearn · 通学万义</a><span>/</span>代码执行沙箱</div>
+    <article class="doc">
+      <h1>代码执行沙箱</h1>
+      <p class="lead">Pyodide 怎么加载、命名空间怎么隔离、输出怎么捕获。</p>
+      <p><code>js/runner.js</code> 封装 Pyodide，让 Python 真的在浏览器里跑。</p>
+<h2 id="加载">加载</h2>
+<pre><code class="language-js"><span class="kd">const</span><span class="w"> </span><span class="nx">PYODIDE_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/'</span><span class="p">;</span>
+<span class="nx">pyodide</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">loadPyodide</span><span class="p">({</span><span class="w"> </span><span class="nx">indexURL</span><span class="o">:</span><span class="w"> </span><span class="nx">PYODIDE_URL</span><span class="w"> </span><span class="p">});</span>
+</code></pre>
+<p>Pyodide 本体约 6MB（压缩后），<strong>只在第一次跑 Python 题时才加载</strong>。
+纯选择题、填空题的课文不会付这个代价。</p>
+<p>标准库开箱可用 —— <code>import math</code>、<code>import json</code> 随便用。
+第三方包要显式声明：</p>
+<pre><code class="language-js"><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">want</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">pyodide</span><span class="p">.</span><span class="nx">loadPackage</span><span class="p">(</span><span class="nx">want</span><span class="p">);</span>
+</code></pre>
+<h2 id="命名空间隔离">命名空间隔离</h2>
+<p>每道题、每课都用一个<strong>全新的 globals dict</strong>：</p>
+<pre><code class="language-js"><span class="nx">ns</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">pyodide</span><span class="p">.</span><span class="nx">runPython</span><span class="p">(</span><span class="s1">'{}'</span><span class="p">);</span><span class="w">   </span><span class="c1">// 新建空的 globals dict</span>
+</code></pre>
+<p>不隔离会怎样？上一题定义的 <code>add</code> 还留在命名空间里，
+学生交一个空的答案也能&quot;通过&quot; —— 因为函数还在。</p>
+<p>切换课文时也会重建：</p>
+<pre><code class="language-js"><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">pyodide</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">nsOwner</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="nx">lessonId</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+</code></pre>
+<h2 id="输出捕获">输出捕获</h2>
+<pre><code class="language-js"><span class="nx">pyodide</span><span class="p">.</span><span class="nx">setStdout</span><span class="p">({</span><span class="w"> </span><span class="nx">batched</span><span class="o">:</span><span class="w"> </span><span class="nx">s</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">buf</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="nx">s</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">'\n'</span><span class="p">;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">});</span>
+<span class="nx">pyodide</span><span class="p">.</span><span class="nx">setStderr</span><span class="p">({</span><span class="w"> </span><span class="nx">batched</span><span class="o">:</span><span class="w"> </span><span class="nx">s</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">buf</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="nx">s</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">'\n'</span><span class="p">;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">});</span>
+</code></pre>
+<p><code>batched</code> 表示每次收到一段文本就回调一次（而不是等全部结束）。</p>
+<p>捕获下来的内容有两个用处：</p>
+<ol>
+<li>显示在输出区</li>
+<li>塞进 <code>__out</code> 变量，供程序题的 assert 使用</li>
+</ol>
+<h2 id="stdin-也要接管">stdin 也要接管</h2>
+<pre><code class="language-js"><span class="nx">pyodide</span><span class="p">.</span><span class="nx">setStdin</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">});</span>
+</code></pre>
+<p>不接管的话，<code>input()</code> 会挂住 —— 浏览器没有默认的 stdin，
+Pyodide 会一直等一个永远不来的输入，<strong>页面看起来就是卡死了</strong>。</p>
+<h2 id="返回值怎么拿">返回值怎么拿</h2>
+<pre><code class="language-js"><span class="kd">const</span><span class="w"> </span><span class="nx">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">pyodide</span><span class="p">.</span><span class="nx">runPython</span><span class="p">(</span><span class="nx">code</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">globals</span><span class="o">:</span><span class="w"> </span><span class="nx">ns</span><span class="w"> </span><span class="p">});</span>
+<span class="p">...</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">rep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">pyodide</span><span class="p">.</span><span class="nx">globals</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'repr'</span><span class="p">)(</span><span class="nx">result</span><span class="p">);</span>
+</code></pre>
+<p>用 <code>repr()</code> 而不是 <code>str()</code>，因为对字符串来说：</p>
+<pre><code class="language-text">str("abc")   → abc
+repr("abc")  → 'abc'
+</code></pre>
+<p>判分时看得到引号，才能区分 <code>abc</code> 和 <code>'abc'</code> —— 否则一个返回字符串 <code>1</code>
+的函数和一个返回整数 <code>1</code> 的函数会被判成一样。</p>
+<p>超长结果会截断（&gt;60 字符），否则输出区会被一个巨大的列表撑爆。</p>
+<h2 id="为什么会失败">为什么会失败</h2>
+<table>
+<thead>
+<tr>
+  <th>现象</th>
+  <th>原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>点运行没反应</td>
+  <td>Pyodide 首次加载中（6MB），等一下</td>
+</tr>
+<tr>
+  <td><code>ModuleNotFoundError</code></td>
+  <td>第三方包需要在题里声明</td>
+</tr>
+<tr>
+  <td>页面卡住不动</td>
+  <td>代码里有 <code>input()</code> 或死循环</td>
+</tr>
+<tr>
+  <td>判分说&quot;函数没定义&quot;</td>
+  <td>函数名拼错，或 starter 里根本没定义</td>
+</tr>
+</tbody>
+</table>
+<p>死循环目前没有超时机制 —— 这是已知限制。
+Pyodide 跑在主线程，死循环会真的把标签页卡住。</p>
+
+      <div class="pager"><a href="../quiz-engine/"><small>← 上一页</small><b>判分引擎</b></a><a class="next" href="../storage-sync/"><small>下一页 →</small><b>进度与笔记同步</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

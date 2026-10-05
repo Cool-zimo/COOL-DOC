@@ -7,6 +7,14 @@ from c_al import AL
 from c_gd import GD
 from c_rest import CANGSHU, COVERFIT, PYTUTOR, TINYMD, MORE
 from c_facehub import FACEHUB
+from c_al_tech import AL_TECH
+from c_tech2 import GD_TECH, COVERFIT_TECH, FACEHUB_TECH
+
+# 技术文档接在使用教程后面
+AL['pages'] += AL_TECH
+GD['pages'] += GD_TECH
+COVERFIT['pages'] += COVERFIT_TECH
+FACEHUB['pages'] += FACEHUB_TECH
 
 APPS = {
     'al': AL,

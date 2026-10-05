@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Virtual filesystem · GitHub Drive · COOL-DOC</title>
+<meta name="description" content="How several repos become one drive, and how paths map.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/github_drive/architecture/">中</a><a class="on" href="../../../en/github_drive/architecture/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="" href="../../../al/">AnyLearn</a><a class="on" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../facehub/">FaceHub</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#path-mapping" style="padding-left:10px;font-size:13px">Path mapping</a><a href="#why-files-arent-at-the-repo-root" style="padding-left:10px;font-size:13px">Why files aren&#x27;t at the repo root</a><a href="#one-file-spanning-several-repos" style="padding-left:10px;font-size:13px">One file spanning several repos</a><a href="#repo-capacity-tracking" style="padding-left:10px;font-size:13px">Repo capacity tracking</a><a href="#post-chunk-metadata" style="padding-left:10px;font-size:13px">Post-chunk metadata</a><a href="#upload-failures-must-roll-back" style="padding-left:10px;font-size:13px">Upload failures must roll back</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">GitHub Drive</a><span>/</span>Virtual filesystem</div>
+    <article class="doc">
+      <h1>Virtual filesystem</h1>
+      <p class="lead">How several repos become one drive, and how paths map.</p>
+      <p>At the core of GitHub Drive is a <strong>virtual filesystem</strong>: you see one unified directory
+tree, but the files physically live across several GitHub repositories.</p>
+<h2 id="path-mapping">Path mapping</h2>
+<pre><code class="language-text">/drive_home/docs/report.pdf
+     ↓
+{ owner: 'Cool-zimo', repo: 'drive-storage-1',
+  path: 'a1b2c3/report.pdf' }
+</code></pre>
+<p>The UI shows virtual paths; the underlying real path carries a <strong>timestamp directory
+prefix</strong>:</p>
+<pre><code class="language-js"><span class="kd">const</span><span class="w"> </span><span class="nx">chunkPath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">().</span><span class="nx">toString</span><span class="p">(</span><span class="mf">36</span><span class="p">)</span><span class="si">}</span><span class="sb">/</span><span class="si">${</span><span class="nx">chunkFileName</span><span class="si">}</span><span class="sb">`</span><span class="p">;</span>
+</code></pre>
+<p><code>toString(36)</code> keeps it short — no name collisions within a directory, and it sorts
+nicely by time.</p>
+<h2 id="why-files-arent-at-the-repo-root">Why files aren't at the repo root</h2>
+<p>The repo root gets occupied by READMEs, config files and the like. One timestamp
+directory layer keeps virtual files from mixing with real ones.</p>
+<h2 id="one-file-spanning-several-repos">One file spanning several repos</h2>
+<p>Large files are split into chunks, and each chunk <strong>picks its own repo</strong>:</p>
+<pre><code class="language-js"><span class="kd">const</span><span class="w"> </span><span class="nx">repo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">autoSelectRepo</span><span class="p">(</span><span class="nx">chunkSizeActual</span><span class="p">);</span>
+</code></pre>
+<p>So a single &quot;file&quot; can physically straddle three repositories. Downloading reads them
+back in recorded order and reassembles.</p>
+<h2 id="repo-capacity-tracking">Repo capacity tracking</h2>
+<pre><code class="language-text">maxRepoSize    900MB   per-repo ceiling
+warnThreshold  0.8     warn at 80% full
+autoCreateRepo true    create a new repo when out of room
+repoNamePrefix drive-storage
+</code></pre>
+<p><code>getRepoUsage()</code> records how much each repo has used; <code>autoSelectRepo()</code> picks one that
+still fits.</p>
+<div class="tip tip-note">
+<b>Capacity is a local estimate, not a live query</b>
+<p>Every uploaded chunk calls <code>addToRepoUsage()</code> to accumulate. To recalibrate,
+run <code>syncAllRepoUsage()</code>, which actually queries real sizes — but it takes a
+while, so it's manual.</p>
+</div>
+
+<h2 id="post-chunk-metadata">Post-chunk metadata</h2>
+<pre><code class="language-text">file: {
+  name, size, chunks: [
+    { owner, repo, path, size, sha },
+    ...
+  ]
+}
+</code></pre>
+<p>The <code>sha</code> must be recorded — GitHub's contents API <strong>requires it</strong> to delete a file.
+Without it, deletion fails.</p>
+<h2 id="upload-failures-must-roll-back">Upload failures must roll back</h2>
+<p>Chunk upload is sequential; dying halfway leaves orphaned chunks behind:</p>
+<pre><code class="language-js"><span class="nx">console</span><span class="p">.</span><span class="nx">warn</span><span class="p">(</span><span class="sb">`[FileManager] 上传失败，正在清理 </span><span class="si">${</span><span class="nx">chunks</span><span class="p">.</span><span class="nx">length</span><span class="si">}</span><span class="sb"> 个已上传分片...`</span><span class="p">);</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">chunk</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">chunks</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">chunk</span><span class="p">.</span><span class="nx">sha</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">deleteFile</span><span class="p">(...,</span><span class="w"> </span><span class="nx">chunk</span><span class="p">.</span><span class="nx">sha</span><span class="p">);</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">storage</span><span class="p">.</span><span class="nx">subtractFromRepoUsage</span><span class="o">?</span><span class="p">.(...);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p>Skip this and unclaimed fragments pile up in your repos, inflating used capacity.</p>
+
+      <div class="pager"><a href="../faq/"><small>← Previous</small><b>FAQ</b></a><a class="next" href="../storage-internals/"><small>Next →</small><b>Chunking and capacity</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

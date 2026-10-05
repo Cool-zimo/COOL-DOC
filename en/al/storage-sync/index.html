@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Progress and note sync · AnyLearn · COOL-DOC</title>
+<meta name="description" content="Data lives in your private repo — how multiple devices avoid clobbering each other.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/al/storage-sync/">中</a><a class="on" href="../../../en/al/storage-sync/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="on" href="../../../al/">AnyLearn</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../facehub/">FaceHub</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#why-github-instead-of-localstorage" style="padding-left:10px;font-size:13px">Why GitHub instead of localStorage</a><a href="#note-merge-strategy-lww" style="padding-left:10px;font-size:13px">Note merge strategy: LWW</a><a href="#progress-data-structures" style="padding-left:10px;font-size:13px">Progress data structures</a><a href="#what-conflict-looks-like" style="padding-left:10px;font-size:13px">What conflict looks like</a><a href="#works-without-signing-in" style="padding-left:10px;font-size:13px">Works without signing in</a><a href="#known-limitations" style="padding-left:10px;font-size:13px">Known limitations</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">AnyLearn</a><span>/</span>Progress and note sync</div>
+    <article class="doc">
+      <h1>Progress and note sync</h1>
+      <p class="lead">Data lives in your private repo — how multiple devices avoid clobbering each other.</p>
+      <p>Progress and notes live in <strong>your own GitHub private repository</strong>, not in a database of
+ours (there is no database).</p>
+<h2 id="why-github-instead-of-localstorage">Why GitHub instead of localStorage</h2>
+<p>The problem with localStorage is that <strong>it disappears on another device</strong>. Study on your
+phone, open your laptop, and it's empty.</p>
+<p>In a GitHub private repo:</p>
+<ul>
+<li>Phone and laptop share one progress state</li>
+<li>The data is yours — it survives this site disappearing</li>
+<li>Our &quot;server&quot; (static files only) never sees your progress</li>
+</ul>
+<h2 id="note-merge-strategy-lww">Note merge strategy: LWW</h2>
+<p>Notes are merged item by item using <strong>Last-Write-Wins</strong>:</p>
+<pre><code class="language-text">each note = { id, text, updatedAt, deleted }
+</code></pre>
+<p>On sync, merge by <code>id</code>; for the same id, take the larger <code>updatedAt</code>.</p>
+<p>Why not three-way merge or a CRDT? Notes are <strong>short, low-conflict text</strong>. The chance of
+editing the same note on two devices at once is tiny — a CRDT isn't worth it here.</p>
+<div class="tip tip-note">
+<b>Deletes are soft</b>
+<p>Deleting a note writes <code>deleted: true</code> rather than removing the record.
+Otherwise a "deleted here, not there" sync resurrects the content — the other side has no
+way to know it was deleted.</p>
+</div>
+
+<h2 id="progress-data-structures">Progress data structures</h2>
+<pre><code class="language-text">Store.K.PROGRESS  completion state per lesson
+Store.K.QUIZ      answer result per question
+Store.K.NOTES     notes
+</code></pre>
+<p>Answering a question fires <code>quiz:done</code>, which <code>exam.js</code> uses to decide whether a lesson
+is complete.</p>
+<h2 id="what-conflict-looks-like">What conflict looks like</h2>
+<p>Two devices both finish the same lesson offline, then come online one after the other:</p>
+<ul>
+<li>The later sync <strong>does not overwrite</strong> the earlier one</li>
+<li>Completed lessons are unioned (both count as done)</li>
+<li>Notes take whichever <code>updatedAt</code> is newer</li>
+</ul>
+<p>Progress means &quot;learned is learned&quot; — there's no un-learning, so a union is correct.</p>
+<h2 id="works-without-signing-in">Works without signing in</h2>
+<p>You can read official textbooks, run code and answer questions while signed out —
+progress just isn't saved (there's no repo to write to).</p>
+<p>Syncing starts once you sign in. That keeps &quot;try before committing&quot; friction-free.</p>
+<h2 id="known-limitations">Known limitations</h2>
+<table>
+<thead>
+<tr>
+  <th>Limitation</th>
+  <th>Detail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Long offline stretches</td>
+  <td>Changes accumulated on two devices merge per the rules above; a few notes may be lost</td>
+</tr>
+<tr>
+  <td>Repo permission</td>
+  <td>Token needs <code>Contents: Read and write</code></td>
+</tr>
+<tr>
+  <td>Rate</td>
+  <td>Every write is an API request; 5000/hour is plenty, but rapid-fire studying writes often</td>
+</tr>
+</tbody>
+</table>
+<p>Note sync is <strong>write-through</strong>, not batched on a timer — no need to wait before closing
+the tab.</p>
+
+      <div class="pager"><a href="../code-runner/"><small>← Previous</small><b>Code execution sandbox</b></a><a style="visibility:hidden"></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

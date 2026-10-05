@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Architecture · AnyLearn · COOL-DOC</title>
+<meta name="description" content="Modules, boot order, and where data lives.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/al/architecture/">中</a><a class="on" href="../../../en/al/architecture/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="on" href="../../../al/">AnyLearn</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../facehub/">FaceHub</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#modules" style="padding-left:10px;font-size:13px">Modules</a><a href="#boot-order--one-thing-to-watch" style="padding-left:10px;font-size:13px">Boot order — one thing to watch</a><a href="#where-data-lives" style="padding-left:10px;font-size:13px">Where data lives</a><a href="#event-flow" style="padding-left:10px;font-size:13px">Event flow</a><a href="#rendering" style="padding-left:10px;font-size:13px">Rendering</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">AnyLearn</a><span>/</span>Architecture</div>
+    <article class="doc">
+      <h1>Architecture</h1>
+      <p class="lead">Modules, boot order, and where data lives.</p>
+      <p>AnyLearn is a <strong>purely static site</strong> — no backend, no database, no server of its own.
+All state lives either in your browser or in your own GitHub repositories.</p>
+<h2 id="modules">Modules</h2>
+<pre><code class="language-text"><span class="nx">js</span><span class="o">/</span>
+<span class="err">├──</span><span class="w"> </span><span class="nx">app</span><span class="p">.</span><span class="nx">js</span><span class="w">        </span><span class="nx">routing</span><span class="p">,</span><span class="w"> </span><span class="nx">home</span><span class="p">,</span><span class="w"> </span><span class="nx">lesson</span><span class="w"> </span><span class="nx">rendering</span><span class="p">,</span><span class="w"> </span><span class="nx">progress</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="nx">notes</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="mi">72</span><span class="nx">KB</span><span class="p">)</span>
+<span class="err">├──</span><span class="w"> </span><span class="nx">dev</span><span class="p">.</span><span class="nx">js</span><span class="w">        </span><span class="nx">authoring</span><span class="w"> </span><span class="nx">platform</span><span class="p">:</span><span class="w"> </span><span class="nx">editor</span><span class="p">,</span><span class="w"> </span><span class="nx">publish</span><span class="p">,</span><span class="w"> </span><span class="nx">draft</span><span class="w"> </span><span class="nx">cloud</span><span class="w"> </span><span class="nx">sync</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="mi">113</span><span class="nx">KB</span><span class="p">)</span>
+<span class="err">├──</span><span class="w"> </span><span class="nx">quiz</span><span class="p">.</span><span class="nx">js</span><span class="w">       </span><span class="nx">question</span><span class="w"> </span><span class="nx">parsing</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="nx">grading</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="mi">31</span><span class="nx">KB</span><span class="p">)</span>
+<span class="err">├──</span><span class="w"> </span><span class="nx">runner</span><span class="p">.</span><span class="nx">js</span><span class="w">     </span><span class="nx">Pyodide</span><span class="w"> </span><span class="nx">wrapper</span><span class="p">:</span><span class="w"> </span><span class="nx">actually</span><span class="w"> </span><span class="nx">running</span><span class="w"> </span><span class="nx">Python</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="mi">14</span><span class="nx">KB</span><span class="p">)</span>
+<span class="err">├──</span><span class="w"> </span><span class="nx">web</span><span class="o">-</span><span class="nx">runner</span><span class="p">.</span><span class="nx">js</span><span class="w"> </span><span class="nx">iframe</span><span class="w"> </span><span class="nx">preview</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="nx">assertions</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nx">HTML</span><span class="o">/</span><span class="nx">CSS</span><span class="o">/</span><span class="nx">JS</span><span class="w"> </span><span class="nx">questions</span>
+<span class="err">├──</span><span class="w"> </span><span class="nx">bookcheck</span><span class="p">.</span><span class="nx">js</span><span class="w">  </span><span class="nx">pre</span><span class="o">-</span><span class="nx">publish</span><span class="w"> </span><span class="nx">validation</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="mi">13</span><span class="nx">KB</span><span class="p">)</span>
+<span class="err">├──</span><span class="w"> </span><span class="nx">ide</span><span class="p">.</span><span class="nx">js</span><span class="w">        </span><span class="nx">the</span><span class="w"> </span><span class="k">in</span><span class="o">-</span><span class="nx">lesson</span><span class="w"> </span><span class="nx">code</span><span class="w"> </span><span class="nx">editor</span>
+<span class="err">├──</span><span class="w"> </span><span class="nx">docs</span><span class="p">.</span><span class="nx">js</span><span class="w">       </span><span class="nx">Markdown</span><span class="w"> </span><span class="nx">rendering</span>
+<span class="err">├──</span><span class="w"> </span><span class="nx">search</span><span class="p">.</span><span class="nx">js</span><span class="w">     </span><span class="nx">search</span><span class="w"> </span><span class="nx">index</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="nx">matching</span>
+<span class="err">├──</span><span class="w"> </span><span class="nx">snippets</span><span class="p">.</span><span class="nx">js</span><span class="w">   </span><span class="nx">question</span><span class="w"> </span><span class="nx">snippet</span><span class="w"> </span><span class="kn">library</span>
+<span class="err">└──</span><span class="w"> </span><span class="nx">i18n</span><span class="o">/</span><span class="w">         </span><span class="nx">zh</span><span class="p">.</span><span class="nx">js</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nx">en</span><span class="p">.</span><span class="nx">js</span>
+</code></pre>
+<p><code>dev.js</code> is the largest (113KB) because <em>writing</em> a book is inherently more complex
+than reading one: editor, chapter tree, live preview, review report, GitHub publishing
+and draft cloud sync all live there.</p>
+<h2 id="boot-order--one-thing-to-watch">Boot order — one thing to watch</h2>
+<pre><code class="language-text">docs.js → runner.js → web-runner.js → quiz.js → dev.js
+</code></pre>
+<p><code>dev.js</code> comes <strong>after</strong> <code>quiz.js</code>.</p>
+<p>That looks obvious now, but it used to be the other way around — <code>dev.js</code> was inserted
+after <code>bookshelf.js</code>, i.e. <strong>before</strong> <code>quiz.js</code>. Since <code>Quiz</code> is only referenced at
+runtime, it happened not to throw.</p>
+<p><strong>That was luck, not correctness.</strong> The moment load order became &quot;used before defined&quot;,
+some unrelated change would blow up — with nothing pointing at script order.</p>
+<h2 id="where-data-lives">Where data lives</h2>
+<table>
+<thead>
+<tr>
+  <th>Data</th>
+  <th>Location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Token, UI preferences</td>
+  <td>browser <code>localStorage</code></td>
+</tr>
+<tr>
+  <td>Progress, quiz results</td>
+  <td>your own GitHub <strong>private repo</strong></td>
+</tr>
+<tr>
+  <td>Notes</td>
+  <td>same, merged item by item</td>
+</tr>
+<tr>
+  <td>Book drafts</td>
+  <td>private repo <code>al-drafts</code></td>
+</tr>
+<tr>
+  <td>Custom snippets</td>
+  <td><code>al-drafts/snippets.json</code></td>
+</tr>
+</tbody>
+</table>
+<p>Why not localStorage for progress? <strong>It vanishes on another device.</strong>
+In a GitHub private repo, your phone and your laptop share one progress state.</p>
+<h2 id="event-flow">Event flow</h2>
+<p>Finishing a question broadcasts <code>quiz:done</code>, which has two listeners:</p>
+<pre><code class="language-text"><span class="nv">quiz</span>:<span class="nv">done</span><span class="w"> </span>→<span class="w"> </span><span class="nv">exam</span>.<span class="nv">js</span><span class="w">      </span><span class="nv">decides</span><span class="w"> </span><span class="s2">"this lesson is complete"</span>
+<span class="w">          </span>→<span class="w"> </span><span class="nv">guardian</span>.<span class="nv">js</span><span class="w">  </span><span class="nv">study</span><span class="o">-</span><span class="nv">time</span><span class="w"> </span><span class="nv">guard</span><span class="w"> </span><span class="ss">(</span><span class="nv">shows</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="k">break</span><span class="w"> </span><span class="nv">reminder</span><span class="ss">)</span>
+</code></pre>
+<div class="tip tip-warn">
+<b>Editor previews must be isolated</b>
+<p>When an author tries out a draft question in the editor, its id carries a
+<code>__dev__:</code> prefix. Prefixed questions <b>never write progress and never
+broadcast events</b> — but grading, hints and explanations still work normally.</p>
+<p>Without the isolation, test-solving a draft question counts as real studying: it
+pollutes progress, corrupts the Ebbinghaus schedule, and might pop a "time to rest"
+dialog out of nowhere.</p>
+</div>
+
+<h2 id="rendering">Rendering</h2>
+<p>Lessons are Markdown, rendered by <code>docs.js</code>. Questions live in fenced blocks:</p>
+<pre><code class="language-text"><span class="err">```</span><span class="nx">quiz</span>
+<span class="k">type</span><span class="p">:</span><span class="w"> </span><span class="kd">choice</span>
+<span class="nx">q</span><span class="p">:</span><span class="w"> </span><span class="nx">Which</span><span class="w"> </span><span class="nx">one</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="nx">a</span><span class="w"> </span><span class="nx">list</span><span class="p">?</span>
+<span class="nx">options</span><span class="p">:</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s">"abc"</span>
+<span class="nx">answer</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
+<span class="err">```</span>
+</code></pre>
+<p><code>quiz.js</code> <code>extractBlocks()</code> pulls these blocks out and parses them into question
+objects first; only the remaining text goes to the Markdown renderer. The order can't
+be reversed — otherwise the fence contents get rendered away as a plain code block.</p>
+
+      <div class="pager"><a href="../faq/"><small>← Previous</small><b>FAQ</b></a><a class="next" href="../quiz-engine/"><small>Next →</small><b>Grading engine</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

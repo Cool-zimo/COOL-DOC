@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>分片与容量 · GitHub Drive · COOL-DOC</title>
+<meta name="description" content="文件怎么切、什么时候切、配置怎么迁移。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/github_drive/storage-internals/">中</a><a class="" href="../../../en/github_drive/storage-internals/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="" href="../../../al/">AnyLearn · 通学万义</a><a class="on" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../facehub/">FaceHub</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#默认配置" style="padding-left:10px;font-size:13px">默认配置</a><a href="#什么时候切" style="padding-left:10px;font-size:13px">什么时候切</a><a href="#分片命名" style="padding-left:10px;font-size:13px">分片命名</a><a href="#两条上传通道" style="padding-left:10px;font-size:13px">两条上传通道</a><a href="#配置迁移" style="padding-left:10px;font-size:13px">配置迁移</a><a href="#容量是怎么算的" style="padding-left:10px;font-size:13px">容量是怎么算的</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">GitHub Drive</a><span>/</span>分片与容量</div>
+    <article class="doc">
+      <h1>分片与容量</h1>
+      <p class="lead">文件怎么切、什么时候切、配置怎么迁移。</p>
+      <h2 id="默认配置">默认配置</h2>
+<pre><code class="language-js"><span class="kd">const</span><span class="w"> </span><span class="nx">defaults</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">maxRepoSize</span><span class="o">:</span><span class="w">    </span><span class="mf">900</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span><span class="p">,</span><span class="w">   </span><span class="c1">// 900MB</span>
+<span class="w">    </span><span class="nx">autoCreateRepo</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">repoNamePrefix</span><span class="o">:</span><span class="w"> </span><span class="s1">'drive-storage'</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">warnThreshold</span><span class="o">:</span><span class="w">  </span><span class="mf">0.8</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">chunkSize</span><span class="o">:</span><span class="w">      </span><span class="mf">512</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span><span class="p">,</span><span class="w">          </span><span class="c1">// 512KB</span>
+<span class="w">    </span><span class="nx">minChunkSize</span><span class="o">:</span><span class="w">   </span><span class="mf">512</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">configVersion</span><span class="o">:</span><span class="w">  </span><span class="mf">2</span>
+<span class="p">};</span>
+</code></pre>
+<div class="tip tip-warn">
+<b>早期文档写的是 10MB 分片，那是错的</b>
+<p>默认值一直是 <b>512KB</b>，也就是说超过 512KB 的文件就会被切分，
+不是等到 10MB。源码注释里专门写了这一条订正。</p>
+</div>
+
+<h2 id="什么时候切">什么时候切</h2>
+<pre><code class="language-js"><span class="kd">const</span><span class="w"> </span><span class="nx">chunkSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">needSplit</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">config</span><span class="p">.</span><span class="nx">chunkSize</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">totalSize</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">totalChunks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">(</span><span class="nx">totalSize</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nx">chunkSize</span><span class="p">);</span>
+</code></pre>
+<p>小于 <code>minChunkSize</code> 的文件不切，整个当一个分片（也就是直接上传）。</p>
+<h2 id="分片命名">分片命名</h2>
+<pre><code class="language-js"><span class="kd">const</span><span class="w"> </span><span class="nx">chunkFileName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">totalChunks</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nx">file</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb">.</span><span class="si">${</span><span class="nx">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">1</span><span class="si">}</span><span class="sb">`</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">file</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
+</code></pre>
+<ul>
+<li>只有一片：用原名</li>
+<li>多片：<code>报告.pdf.1</code>、<code>报告.pdf.2</code>……</li>
+</ul>
+<p>为什么用 <code>.1</code> <code>.2</code> 而不是 <code>.part1</code>？简短，而且排序天然正确。</p>
+<h2 id="两条上传通道">两条上传通道</h2>
+<pre><code class="language-js"><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">chunkSizeActual</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">uploadLargeFile</span><span class="p">(...);</span><span class="w">        </span><span class="c1">// Git Data API</span>
+<span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">createOrUpdateFileBinary</span><span class="p">(...);</span><span class="w"> </span><span class="c1">// contents API + base64</span>
+<span class="p">}</span>
+</code></pre>
+<table>
+<thead>
+<tr>
+  <th>通道</th>
+  <th>适用</th>
+  <th>限制</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>contents API</td>
+  <td>≤ 1MB</td>
+  <td>base64 后体积涨 33%</td>
+</tr>
+<tr>
+  <td>Git Data API</td>
+  <td>&gt; 1MB</td>
+  <td>走 blob/tree/commit，能到 100MB</td>
+</tr>
+</tbody>
+</table>
+<p>contents API 对单个文件有 1MB 硬限制，超了必须走 blob API。</p>
+<h2 id="配置迁移">配置迁移</h2>
+<pre><code class="language-js"><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">saved</span><span class="p">.</span><span class="nx">chunkSize</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="mf">50</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span>
+<span class="w">    </span><span class="o">||</span><span class="w"> </span><span class="nx">saved</span><span class="p">.</span><span class="nx">chunkSize</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="mf">20</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span>
+<span class="w">    </span><span class="o">||</span><span class="w"> </span><span class="nx">saved</span><span class="p">.</span><span class="nx">chunkSize</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="mf">5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">saved</span><span class="p">.</span><span class="nx">chunkSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">512</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">needUpdate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+<p>早期的分片大小是 50MB、20MB、5MB，都统一改成 512KB。
+<strong>为什么要改小</strong>：分片太大，一次上传失败要重传的就多；
+而且 contents API 有 1MB 限制，大分片只能全走 blob API。</p>
+<p>缺字段也会自动补：</p>
+<pre><code class="language-js"><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">key</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">defaults</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">saved</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="kc">undefined</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">saved</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">defaults</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span><span class="w"> </span><span class="nx">needUpdate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p>这样加新配置项时，老用户的配置不会变成半截。</p>
+<h2 id="容量是怎么算的">容量是怎么算的</h2>
+<p>每个分片上传成功后累加：</p>
+<pre><code class="language-js"><span class="k">this</span><span class="p">.</span><span class="nx">storage</span><span class="p">.</span><span class="nx">addToRepoUsage</span><span class="p">(</span><span class="nx">repo</span><span class="p">.</span><span class="nx">owner</span><span class="p">,</span><span class="w"> </span><span class="nx">repo</span><span class="p">.</span><span class="nx">repo</span><span class="p">,</span><span class="w"> </span><span class="nx">chunkSizeActual</span><span class="p">);</span>
+</code></pre>
+<p>删除时减回去。<code>getRepoUsage()</code> 返回：</p>
+<pre><code class="language-text">{ "owner/repo": { size: 123456, updatedAt: "2026-10-05T..." } }
+</code></pre>
+
+      <div class="pager"><a href="../architecture/"><small>← 上一页</small><b>虚拟文件系统</b></a><a style="visibility:hidden"></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

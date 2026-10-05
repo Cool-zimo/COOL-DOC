@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Code execution sandbox · AnyLearn · COOL-DOC</title>
+<meta name="description" content="How Pyodide loads, how namespaces are isolated, how output is captured.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/al/code-runner/">中</a><a class="on" href="../../../en/al/code-runner/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="on" href="../../../al/">AnyLearn</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../facehub/">FaceHub</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#loading" style="padding-left:10px;font-size:13px">Loading</a><a href="#namespace-isolation" style="padding-left:10px;font-size:13px">Namespace isolation</a><a href="#capturing-output" style="padding-left:10px;font-size:13px">Capturing output</a><a href="#stdin-must-be-handled-too" style="padding-left:10px;font-size:13px">stdin must be handled too</a><a href="#getting-the-return-value" style="padding-left:10px;font-size:13px">Getting the return value</a><a href="#why-things-fail" style="padding-left:10px;font-size:13px">Why things fail</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">AnyLearn</a><span>/</span>Code execution sandbox</div>
+    <article class="doc">
+      <h1>Code execution sandbox</h1>
+      <p class="lead">How Pyodide loads, how namespaces are isolated, how output is captured.</p>
+      <p><code>js/runner.js</code> wraps Pyodide so Python actually runs in the browser.</p>
+<h2 id="loading">Loading</h2>
+<pre><code class="language-js"><span class="kd">const</span><span class="w"> </span><span class="nx">PYODIDE_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/'</span><span class="p">;</span>
+<span class="nx">pyodide</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">loadPyodide</span><span class="p">({</span><span class="w"> </span><span class="nx">indexURL</span><span class="o">:</span><span class="w"> </span><span class="nx">PYODIDE_URL</span><span class="w"> </span><span class="p">});</span>
+</code></pre>
+<p>Pyodide itself is ~6MB (compressed) and is <strong>loaded lazily</strong> — only when a Python
+question is actually run. Lessons with only choice or fill-in questions never pay that
+cost.</p>
+<p>The standard library works out of the box — <code>import math</code>, <code>import json</code>, anything.
+Third-party packages must be declared explicitly:</p>
+<pre><code class="language-js"><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">want</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">pyodide</span><span class="p">.</span><span class="nx">loadPackage</span><span class="p">(</span><span class="nx">want</span><span class="p">);</span>
+</code></pre>
+<h2 id="namespace-isolation">Namespace isolation</h2>
+<p>Every question and every lesson gets a <strong>brand-new globals dict</strong>:</p>
+<pre><code class="language-js"><span class="nx">ns</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">pyodide</span><span class="p">.</span><span class="nx">runPython</span><span class="p">(</span><span class="s1">'{}'</span><span class="p">);</span><span class="w">   </span><span class="c1">// fresh empty globals dict</span>
+</code></pre>
+<p>What happens without it? The <code>add</code> defined in the previous question is still in the
+namespace, so a student submitting an empty answer still &quot;passes&quot; — the function is
+still there.</p>
+<p>It's also rebuilt when switching lessons:</p>
+<pre><code class="language-js"><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">pyodide</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">nsOwner</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="nx">lessonId</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+</code></pre>
+<h2 id="capturing-output">Capturing output</h2>
+<pre><code class="language-js"><span class="nx">pyodide</span><span class="p">.</span><span class="nx">setStdout</span><span class="p">({</span><span class="w"> </span><span class="nx">batched</span><span class="o">:</span><span class="w"> </span><span class="nx">s</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">buf</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="nx">s</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">'\n'</span><span class="p">;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">});</span>
+<span class="nx">pyodide</span><span class="p">.</span><span class="nx">setStderr</span><span class="p">({</span><span class="w"> </span><span class="nx">batched</span><span class="o">:</span><span class="w"> </span><span class="nx">s</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">buf</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="nx">s</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">'\n'</span><span class="p">;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">});</span>
+</code></pre>
+<p><code>batched</code> means the callback fires on each chunk of text rather than at the very end.</p>
+<p>The captured text serves two purposes:</p>
+<ol>
+<li>Displayed in the output pane</li>
+<li>Pushed into the <code>__out</code> variable for program-question asserts</li>
+</ol>
+<h2 id="stdin-must-be-handled-too">stdin must be handled too</h2>
+<pre><code class="language-js"><span class="nx">pyodide</span><span class="p">.</span><span class="nx">setStdin</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">});</span>
+</code></pre>
+<p>Skip this and <code>input()</code> hangs — a browser has no default stdin, so Pyodide waits
+forever for input that will never arrive. <strong>The page just looks frozen.</strong></p>
+<h2 id="getting-the-return-value">Getting the return value</h2>
+<pre><code class="language-js"><span class="kd">const</span><span class="w"> </span><span class="nx">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">pyodide</span><span class="p">.</span><span class="nx">runPython</span><span class="p">(</span><span class="nx">code</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">globals</span><span class="o">:</span><span class="w"> </span><span class="nx">ns</span><span class="w"> </span><span class="p">});</span>
+<span class="p">...</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">rep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">pyodide</span><span class="p">.</span><span class="nx">globals</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'repr'</span><span class="p">)(</span><span class="nx">result</span><span class="p">);</span>
+</code></pre>
+<p><code>repr()</code> rather than <code>str()</code>, because for strings:</p>
+<pre><code class="language-text">str("abc")   → abc
+repr("abc")  → 'abc'
+</code></pre>
+<p>Seeing the quotes is what lets grading distinguish <code>abc</code> from <code>'abc'</code> — otherwise a
+function returning the string <code>1</code> and one returning the integer <code>1</code> look identical.</p>
+<p>Very long results are truncated (&gt;60 chars), otherwise one huge list blows up the
+output pane.</p>
+<h2 id="why-things-fail">Why things fail</h2>
+<table>
+<thead>
+<tr>
+  <th>Symptom</th>
+  <th>Cause</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Run button does nothing</td>
+  <td>Pyodide is loading for the first time (~6MB); wait</td>
+</tr>
+<tr>
+  <td><code>ModuleNotFoundError</code></td>
+  <td>A third-party package must be declared in the question</td>
+</tr>
+<tr>
+  <td>Page freezes</td>
+  <td>Your code has <code>input()</code> or an infinite loop</td>
+</tr>
+<tr>
+  <td>&quot;Function not found&quot;</td>
+  <td>Misspelled name, or the starter never defined it</td>
+</tr>
+</tbody>
+</table>
+<p>Infinite loops currently have no timeout — a known limitation. Pyodide runs on the main
+thread, so a real infinite loop genuinely locks up the tab.</p>
+
+      <div class="pager"><a href="../quiz-engine/"><small>← Previous</small><b>Grading engine</b></a><a class="next" href="../storage-sync/"><small>Next →</small><b>Progress and note sync</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chunking and capacity · GitHub Drive · COOL-DOC</title>
+<meta name="description" content="How files are split, when, and how config migrates.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/github_drive/storage-internals/">中</a><a class="on" href="../../../en/github_drive/storage-internals/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="" href="../../../al/">AnyLearn</a><a class="on" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../facehub/">FaceHub</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#defaults" style="padding-left:10px;font-size:13px">Defaults</a><a href="#when-splitting-happens" style="padding-left:10px;font-size:13px">When splitting happens</a><a href="#chunk-naming" style="padding-left:10px;font-size:13px">Chunk naming</a><a href="#two-upload-paths" style="padding-left:10px;font-size:13px">Two upload paths</a><a href="#config-migration" style="padding-left:10px;font-size:13px">Config migration</a><a href="#how-capacity-is-computed" style="padding-left:10px;font-size:13px">How capacity is computed</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">GitHub Drive</a><span>/</span>Chunking and capacity</div>
+    <article class="doc">
+      <h1>Chunking and capacity</h1>
+      <p class="lead">How files are split, when, and how config migrates.</p>
+      <h2 id="defaults">Defaults</h2>
+<pre><code class="language-js"><span class="kd">const</span><span class="w"> </span><span class="nx">defaults</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">maxRepoSize</span><span class="o">:</span><span class="w">    </span><span class="mf">900</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span><span class="p">,</span><span class="w">   </span><span class="c1">// 900MB</span>
+<span class="w">    </span><span class="nx">autoCreateRepo</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">repoNamePrefix</span><span class="o">:</span><span class="w"> </span><span class="s1">'drive-storage'</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">warnThreshold</span><span class="o">:</span><span class="w">  </span><span class="mf">0.8</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">chunkSize</span><span class="o">:</span><span class="w">      </span><span class="mf">512</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span><span class="p">,</span><span class="w">          </span><span class="c1">// 512KB</span>
+<span class="w">    </span><span class="nx">minChunkSize</span><span class="o">:</span><span class="w">   </span><span class="mf">512</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">configVersion</span><span class="o">:</span><span class="w">  </span><span class="mf">2</span>
+<span class="p">};</span>
+</code></pre>
+<div class="tip tip-warn">
+<b>Early docs said 10MB chunks — that was wrong</b>
+<p>The default has always been <b>512KB</b>, meaning files over 512KB get split — not
+only past 10MB. The source comment carries this correction explicitly.</p>
+</div>
+
+<h2 id="when-splitting-happens">When splitting happens</h2>
+<pre><code class="language-js"><span class="kd">const</span><span class="w"> </span><span class="nx">chunkSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">needSplit</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">config</span><span class="p">.</span><span class="nx">chunkSize</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">totalSize</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">totalChunks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">(</span><span class="nx">totalSize</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nx">chunkSize</span><span class="p">);</span>
+</code></pre>
+<p>Files below <code>minChunkSize</code> aren't split — they're uploaded as a single chunk (i.e.
+directly).</p>
+<h2 id="chunk-naming">Chunk naming</h2>
+<pre><code class="language-js"><span class="kd">const</span><span class="w"> </span><span class="nx">chunkFileName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">totalChunks</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nx">file</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb">.</span><span class="si">${</span><span class="nx">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">1</span><span class="si">}</span><span class="sb">`</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">file</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
+</code></pre>
+<ul>
+<li>One chunk: keep the original name</li>
+<li>Many chunks: <code>report.pdf.1</code>, <code>report.pdf.2</code>, …</li>
+</ul>
+<p>Why <code>.1</code> <code>.2</code> instead of <code>.part1</code>? Shorter, and it sorts correctly by nature.</p>
+<h2 id="two-upload-paths">Two upload paths</h2>
+<pre><code class="language-js"><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">chunkSizeActual</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">uploadLargeFile</span><span class="p">(...);</span><span class="w">        </span><span class="c1">// Git Data API</span>
+<span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">createOrUpdateFileBinary</span><span class="p">(...);</span><span class="w"> </span><span class="c1">// contents API + base64</span>
+<span class="p">}</span>
+</code></pre>
+<table>
+<thead>
+<tr>
+  <th>Path</th>
+  <th>Use when</th>
+  <th>Limit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>contents API</td>
+  <td>≤ 1MB</td>
+  <td>base64 inflates size by 33%</td>
+</tr>
+<tr>
+  <td>Git Data API</td>
+  <td>&gt; 1MB</td>
+  <td>blob/tree/commit, up to 100MB</td>
+</tr>
+</tbody>
+</table>
+<p>The contents API has a hard 1MB per-file limit; anything bigger must go through the
+blob API.</p>
+<h2 id="config-migration">Config migration</h2>
+<pre><code class="language-js"><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">saved</span><span class="p">.</span><span class="nx">chunkSize</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="mf">50</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span>
+<span class="w">    </span><span class="o">||</span><span class="w"> </span><span class="nx">saved</span><span class="p">.</span><span class="nx">chunkSize</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="mf">20</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span>
+<span class="w">    </span><span class="o">||</span><span class="w"> </span><span class="nx">saved</span><span class="p">.</span><span class="nx">chunkSize</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="mf">5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">saved</span><span class="p">.</span><span class="nx">chunkSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">512</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1024</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">needUpdate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+<p>Older chunk sizes — 50MB, 20MB, 5MB — are all normalised to 512KB.
+<strong>Why smaller</strong>: a big chunk means more to re-upload when one attempt fails, and the
+contents API's 1MB cap forces large chunks onto the blob API anyway.</p>
+<p>Missing fields are filled in too:</p>
+<pre><code class="language-js"><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">key</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">defaults</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">saved</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="kc">undefined</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">saved</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">defaults</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span><span class="w"> </span><span class="nx">needUpdate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p>So adding a new config option never leaves existing users with a half-populated config.</p>
+<h2 id="how-capacity-is-computed">How capacity is computed</h2>
+<p>Every successful chunk upload accumulates:</p>
+<pre><code class="language-js"><span class="k">this</span><span class="p">.</span><span class="nx">storage</span><span class="p">.</span><span class="nx">addToRepoUsage</span><span class="p">(</span><span class="nx">repo</span><span class="p">.</span><span class="nx">owner</span><span class="p">,</span><span class="w"> </span><span class="nx">repo</span><span class="p">.</span><span class="nx">repo</span><span class="p">,</span><span class="w"> </span><span class="nx">chunkSizeActual</span><span class="p">);</span>
+</code></pre>
+<p>Deletion subtracts. <code>getRepoUsage()</code> returns:</p>
+<pre><code class="language-text">{ "owner/repo": { size: 123456, updatedAt: "2026-10-05T..." } }
+</code></pre>
+
+      <div class="pager"><a href="../architecture/"><small>← Previous</small><b>Virtual filesystem</b></a><a style="visibility:hidden"></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

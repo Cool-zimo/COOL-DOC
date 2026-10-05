@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>整体架构 · AnyLearn · 通学万义 · COOL-DOC</title>
+<meta name="description" content="模块划分、启动顺序、数据存在哪。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/al/architecture/">中</a><a class="" href="../../../en/al/architecture/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="on" href="../../../al/">AnyLearn · 通学万义</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../facehub/">FaceHub</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#模块划分" style="padding-left:10px;font-size:13px">模块划分</a><a href="#启动顺序有一处必须注意" style="padding-left:10px;font-size:13px">启动顺序有一处必须注意</a><a href="#数据存在哪" style="padding-left:10px;font-size:13px">数据存在哪</a><a href="#事件流" style="padding-left:10px;font-size:13px">事件流</a><a href="#正文渲染" style="padding-left:10px;font-size:13px">正文渲染</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">AnyLearn · 通学万义</a><span>/</span>整体架构</div>
+    <article class="doc">
+      <h1>整体架构</h1>
+      <p class="lead">模块划分、启动顺序、数据存在哪。</p>
+      <p>AnyLearn 是一个<strong>纯静态站点</strong> —— 没有后端、没有数据库、没有一个属于自己的服务器。
+所有状态要么在浏览器里，要么在你自己的 GitHub 仓库里。</p>
+<h2 id="模块划分">模块划分</h2>
+<pre><code class="language-text">js/
+├── app.js        路由、首页、课文渲染、进度与笔记（约 72KB）
+├── dev.js        开发者平台：编辑器、发布、草稿云同步（约 113KB）
+├── quiz.js       题型解析与判分（约 31KB）
+├── runner.js     Pyodide 封装：真跑 Python（约 14KB）
+├── web-runner.js HTML / CSS / JS 题的 iframe 预览与断言
+├── bookcheck.js  发布前校验（约 13KB）
+├── ide.js        课文里的代码编辑器
+├── docs.js       Markdown 渲染
+├── search.js     搜索索引与匹配
+├── snippets.js   题目库片段
+└── i18n/         zh.js / en.js
+</code></pre>
+<p><code>dev.js</code> 之所以最大（113KB），是因为&quot;写书&quot;这件事本身比&quot;读书&quot;复杂：
+编辑器、章节树、实时预览、评审报告、GitHub 发布、草稿云同步全在里面。</p>
+<h2 id="启动顺序有一处必须注意">启动顺序有一处必须注意</h2>
+<pre><code class="language-text">docs.js → runner.js → web-runner.js → quiz.js → dev.js
+</code></pre>
+<p><code>dev.js</code> 排在 <strong><code>quiz.js</code> 之后</strong>。</p>
+<p>这看着理所当然，但它曾经是反的 —— <code>dev.js</code> 被插在 <code>bookshelf.js</code> 后面，
+也就是在 <code>quiz.js</code> <strong>之前</strong>。因为运行时才引用 <code>Quiz</code>，碰巧没报错。</p>
+<p><strong>这是靠巧合活着的。</strong> 顺序一旦变成&quot;先加载后声明&quot;，某次改动就会突然炸掉，
+而且很难联想到是脚本顺序的问题。</p>
+<h2 id="数据存在哪">数据存在哪</h2>
+<table>
+<thead>
+<tr>
+  <th>数据</th>
+  <th>位置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Token、界面偏好</td>
+  <td>浏览器 <code>localStorage</code></td>
+</tr>
+<tr>
+  <td>学习进度、做题结果</td>
+  <td>你自己的 GitHub <strong>私有仓库</strong></td>
+</tr>
+<tr>
+  <td>笔记</td>
+  <td>同上，逐条合并</td>
+</tr>
+<tr>
+  <td>书籍草稿</td>
+  <td>私有仓库 <code>al-drafts</code></td>
+</tr>
+<tr>
+  <td>自定义片段</td>
+  <td><code>al-drafts/snippets.json</code></td>
+</tr>
+</tbody>
+</table>
+<p>进度为什么不放 localStorage？<strong>换台设备就没了。</strong>
+放进 GitHub 私有仓库，手机和电脑是同一份进度。</p>
+<h2 id="事件流">事件流</h2>
+<p>做题完成会广播 <code>quiz:done</code>，有两个监听者：</p>
+<pre><code class="language-text">quiz:done → exam.js      判定"这一课学完了"
+          → guardian.js  学习时长守护（弹休息提醒）
+</code></pre>
+<div class="tip tip-warn">
+<b>编辑器预览必须隔离</b>
+<p>作者在编辑器里试做自己出的草稿题时，id 会带 <code>__dev__:</code> 前缀。
+带前缀的题<b>不写进度、不广播事件</b>，但判分、提示、解释照常显示。</p>
+<p>不隔离的话，试做一道草稿题就会被当成真实学习行为：污染进度、
+污染艾宾浩斯排期，还可能突然弹一个"该休息了"。</p>
+</div>
+
+<h2 id="正文渲染">正文渲染</h2>
+<p>课文是 Markdown，走 <code>docs.js</code> 渲染。题目写在围栏块里：</p>
+<pre><code class="language-text"><span class="err">```</span><span class="nx">quiz</span>
+<span class="k">type</span><span class="p">:</span><span class="w"> </span><span class="kd">choice</span>
+<span class="nx">q</span><span class="p">:</span><span class="w"> </span><span class="nx">下面哪个是列表</span><span class="err">？</span>
+<span class="nx">options</span><span class="p">:</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s">"abc"</span>
+<span class="nx">answer</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
+<span class="err">```</span>
+</code></pre>
+<p><code>quiz.js</code> 的 <code>extractBlocks()</code> 先把这些块抠出来解析成题目对象，
+剩下的正文才交给 Markdown 渲染器。顺序不能反 ——
+否则围栏内容会被当成代码块渲染掉。</p>
+
+      <div class="pager"><a href="../faq/"><small>← 上一页</small><b>常见问题</b></a><a class="next" href="../quiz-engine/"><small>下一页 →</small><b>判分引擎</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

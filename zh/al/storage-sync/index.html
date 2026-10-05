@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>进度与笔记同步 · AnyLearn · 通学万义 · COOL-DOC</title>
+<meta name="description" content="数据存在你的私有仓库里，多设备怎么不互相抹掉。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/al/storage-sync/">中</a><a class="" href="../../../en/al/storage-sync/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="on" href="../../../al/">AnyLearn · 通学万义</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../facehub/">FaceHub</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#为什么放-github-而不放-localstorage" style="padding-left:10px;font-size:13px">为什么放 GitHub 而不放 localStorage</a><a href="#笔记的合并策略lww" style="padding-left:10px;font-size:13px">笔记的合并策略：LWW</a><a href="#进度的数据结构" style="padding-left:10px;font-size:13px">进度的数据结构</a><a href="#冲突时的表现" style="padding-left:10px;font-size:13px">冲突时的表现</a><a href="#未登录也能用" style="padding-left:10px;font-size:13px">未登录也能用</a><a href="#已知限制" style="padding-left:10px;font-size:13px">已知限制</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">AnyLearn · 通学万义</a><span>/</span>进度与笔记同步</div>
+    <article class="doc">
+      <h1>进度与笔记同步</h1>
+      <p class="lead">数据存在你的私有仓库里，多设备怎么不互相抹掉。</p>
+      <p>进度和笔记存在<strong>你自己的 GitHub 私有仓库</strong>里，不是本站的数据库（本站没有数据库）。</p>
+<h2 id="为什么放-github-而不放-localstorage">为什么放 GitHub 而不放 localStorage</h2>
+<p>localStorage 的问题是<strong>换设备就没了</strong>。手机上学完，电脑上打开是空的。</p>
+<p>放 GitHub 私有仓库：</p>
+<ul>
+<li>手机和电脑共享同一份进度</li>
+<li>数据是你的，本站关了也在</li>
+<li>本站服务器（其实只有静态文件）看不到你的进度</li>
+</ul>
+<h2 id="笔记的合并策略lww">笔记的合并策略：LWW</h2>
+<p>笔记逐条采用 <strong>Last-Write-Wins</strong>（最后写入者胜）：</p>
+<pre><code class="language-text">每条笔记 = { id, text, updatedAt, deleted }
+</code></pre>
+<p>同步时按 <code>id</code> 合并，同一条取 <code>updatedAt</code> 更大的那个。</p>
+<p>为什么不做三路合并或 CRDT？笔记是<strong>短文本、低冲突</strong>的。
+同一条笔记在两台设备上同时编辑的概率很低，为这个上 CRDT 不划算。</p>
+<div class="tip tip-note">
+<b>删除是软删除</b>
+<p>删笔记写的是 <code>deleted: true</code>，不是真的移除记录。
+否则"这边删了、那边没删"的同步会让删掉的内容复活 ——
+因为对端不知道它已经被删了。</p>
+</div>
+
+<h2 id="进度的数据结构">进度的数据结构</h2>
+<pre><code class="language-text">Store.K.PROGRESS  每课完成状态
+Store.K.QUIZ      每道题的作答结果
+Store.K.NOTES     笔记
+</code></pre>
+<p>做题结果会触发 <code>quiz:done</code>，<code>exam.js</code> 据此判定一课是否学完。</p>
+<h2 id="冲突时的表现">冲突时的表现</h2>
+<p>两台设备都离线学完同一课，然后先后联网：</p>
+<ul>
+<li>后同步的那台<strong>不会覆盖</strong>先同步的</li>
+<li>完成的课取并集（都算完成）</li>
+<li>笔记按 <code>updatedAt</code> 取新</li>
+</ul>
+<p>进度是&quot;学会了就是学会了&quot;，没有回退场景 —— 所以并集是对的。</p>
+<h2 id="未登录也能用">未登录也能用</h2>
+<p>不登录可以读官方教材、跑代码、做题 —— 只是<strong>不保存进度</strong>（没有仓库可写）。</p>
+<p>登录后才往仓库同步。这个设计让&quot;先试试看&quot;没有任何门槛。</p>
+<h2 id="已知限制">已知限制</h2>
+<table>
+<thead>
+<tr>
+  <th>限制</th>
+  <th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>离线太久</td>
+  <td>两台设备各自积累的改动，同步时按上面的规则合并，可能丢少量笔记</td>
+</tr>
+<tr>
+  <td>仓库权限</td>
+  <td>Token 必须有 <code>Contents: Read and write</code></td>
+</tr>
+<tr>
+  <td>频率</td>
+  <td>每次提交是一笔 API 请求，5000 次/小时的配额够用，但连续刷题会频繁写</td>
+</tr>
+</tbody>
+</table>
+<p>笔记同步是<strong>写完即推</strong>，不是定时批量 —— 关页面前不用等。</p>
+
+      <div class="pager"><a href="../code-runner/"><small>← 上一页</small><b>代码执行沙箱</b></a><a style="visibility:hidden"></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

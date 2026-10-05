@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>API and caching · FaceHub · COOL-DOC</title>
+<meta name="description" content="REST wrapper, cache invalidation, and one place where clearing half the keys breaks things.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/facehub/api-cache/">中</a><a class="on" href="../../../en/facehub/api-cache/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="" href="../../../al/">AnyLearn</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="on" href="../../../facehub/">FaceHub</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#why-cache-at-all" style="padding-left:10px;font-size:13px">Why cache at all</a><a href="#four-cache-keys-must-be-cleared-together" style="padding-left:10px;font-size:13px">Four cache keys must be cleared together</a><a href="#large-files-go-through-the-blob-api" style="padding-left:10px;font-size:13px">Large files go through the blob API</a><a href="#messages-are-issue-comments" style="padding-left:10px;font-size:13px">Messages are issue comments</a><a href="#key-storage" style="padding-left:10px;font-size:13px">Key storage</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">FaceHub</a><span>/</span>API and caching</div>
+    <article class="doc">
+      <h1>API and caching</h1>
+      <p class="lead">REST wrapper, cache invalidation, and one place where clearing half the keys breaks things.</p>
+      <p><code>js/api.js</code> wraps the GitHub REST API and adds a localStorage cache layer.</p>
+<h2 id="why-cache-at-all">Why cache at all</h2>
+<p>Unauthenticated GitHub API allows only 60 requests/hour; 5000 once signed in. A chat app
+polls for messages constantly — without caching you burn through that fast.</p>
+<h2 id="four-cache-keys-must-be-cleared-together">Four cache keys must be cleared together</h2>
+<p>This is the easiest thing to get wrong:</p>
+<pre><code class="language-js"><span class="c1">// end of writeFile</span>
+<span class="k">this</span><span class="p">.</span><span class="nx">_ls</span><span class="p">(</span><span class="s1">'fh:etag:'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">owner</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">'/'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">repo</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span><span class="w">              </span><span class="c1">// directory ETag</span>
+<span class="k">this</span><span class="p">.</span><span class="nx">_ls</span><span class="p">(</span><span class="s1">'fh:c:'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">owner</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">'/'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">repo</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">'/'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">path</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span><span class="w">    </span><span class="c1">// content (text)</span>
+<span class="k">this</span><span class="p">.</span><span class="nx">_ls</span><span class="p">(</span><span class="s1">'fh:c:'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">owner</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">'/'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">repo</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">'/'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">path</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">'|b64'</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span><span class="w"> </span><span class="c1">// content (base64)</span>
+<span class="k">this</span><span class="p">.</span><span class="nx">_ls</span><span class="p">(</span><span class="s1">'fh:e:'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">owner</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">'/'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">repo</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">'/'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">path</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span><span class="w">    </span><span class="c1">// file ETag</span>
+</code></pre>
+<div class="tip tip-bad">
+<b>Clearing only the first one is a bug</b>
+<p>Write then immediately read, and you get the <b>stale value</b> — the content cache is
+still there. It shows up as "message sent but invisible", with no error at all.</p>
+</div>
+
+<p>All four are needed because the same file may be read as text or as base64 (image
+attachments) — two separate caches — plus one ETag at directory level and one at file
+level.</p>
+<h2 id="large-files-go-through-the-blob-api">Large files go through the blob API</h2>
+<pre><code class="language-js"><span class="nx">readLargeFile</span><span class="p">()</span><span class="w">   </span><span class="c1">// /git/blobs/{sha}</span>
+</code></pre>
+<p>The contents API has a <strong>1MB per-file limit</strong>; beyond that reads fail. Large attachments
+must use the blob API.</p>
+<h2 id="messages-are-issue-comments">Messages are issue comments</h2>
+<p>FaceHub has no server of its own — messages live in <strong>GitHub issue comments</strong>:</p>
+<table>
+<thead>
+<tr>
+  <th>Method</th>
+  <th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>messages(owner, repo, issueNumber, since)</code></td>
+  <td>incremental fetch; <code>since</code> is a timestamp</td>
+</tr>
+<tr>
+  <td><code>sendMessage</code></td>
+  <td>post one</td>
+</tr>
+<tr>
+  <td><code>deleteMessage</code></td>
+  <td>delete a comment</td>
+</tr>
+<tr>
+  <td><code>clearMessages</code></td>
+  <td>bulk clear (with progress callback)</td>
+</tr>
+</tbody>
+</table>
+<p><code>since</code> is the performance lever — only new messages are fetched, never all history.</p>
+<h2 id="key-storage">Key storage</h2>
+<pre><code class="language-text"><span class="nv">localStorage</span>
+├──<span class="w"> </span><span class="nv">fh</span>:<span class="nv">id</span>:{<span class="nv">login</span>}<span class="w">          </span><span class="nv">identity</span><span class="w"> </span><span class="nv">key</span><span class="w"> </span><span class="ss">(</span><span class="nv">lose</span><span class="w"> </span><span class="nv">it</span><span class="w"> </span><span class="nv">and</span><span class="w"> </span><span class="nv">nothing</span><span class="w"> </span><span class="nv">decrypts</span><span class="ss">)</span>
+└──<span class="w"> </span><span class="nv">fh</span>:<span class="nv">sk</span>:{<span class="nv">login</span>}<span class="o">/</span>{<span class="nv">room</span>}<span class="w">   </span><span class="nv">session</span><span class="w"> </span><span class="nv">key</span><span class="w"> </span><span class="ss">(</span><span class="nv">legacy</span>,<span class="w"> </span><span class="nv">kept</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">compatibility</span><span class="ss">)</span>
+</code></pre>
+<p>Exports use the v2 format, versioned:</p>
+<pre><code class="language-jsonc">{
+  "v": 2,
+  "type": "facehub-keys",
+  "identities": { "cool-zimo": { "priv": "...", "pub": "..." } },
+  "rooms": { ... },
+  "exportedAt": "..."
+}
+</code></pre>
+<div class="tip tip-warn">
+<b>The backup is plaintext</b>
+<p>Not encrypting it with a passphrase is deliberate: it introduces a worse problem —
+forgetting the passphrase. Of the two risks, guarding the file is the lesser evil.
+The UI says so clearly.</p>
+</div>
+
+
+      <div class="pager"><a href="../crypto/"><small>← Previous</small><b>Crypto design</b></a><a style="visibility:hidden"></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>判分引擎 · AnyLearn · 通学万义 · COOL-DOC</title>
+<meta name="description" content="题目怎么解析、怎么判分，以及为什么有些坑必须绕。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/al/quiz-engine/">中</a><a class="" href="../../../en/al/quiz-engine/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="on" href="../../../al/">AnyLearn · 通学万义</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../facehub/">FaceHub</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#参数切分括号感知" style="padding-left:10px;font-size:13px">参数切分：括号感知</a><a href="#一个反直觉的决定只按逗号切不支持空格" style="padding-left:10px;font-size:13px">一个反直觉的决定：只按逗号切，不支持空格</a><a href="#字面量转换" style="padding-left:10px;font-size:13px">字面量转换</a><a href="#随机结果题光判范围不够" style="padding-left:10px;font-size:13px">随机结果题：光判范围不够</a><a href="#程序题把输出暴露成变量" style="padding-left:10px;font-size:13px">程序题：把输出暴露成变量</a><a href="#网页题的判分在-iframe-里" style="padding-left:10px;font-size:13px">网页题的判分在 iframe 里</a><a href="#local-与-project-是自评" style="padding-left:10px;font-size:13px">local 与 project 是自评</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">AnyLearn · 通学万义</a><span>/</span>判分引擎</div>
+    <article class="doc">
+      <h1>判分引擎</h1>
+      <p class="lead">题目怎么解析、怎么判分，以及为什么有些坑必须绕。</p>
+      <p>判分引擎在 <code>js/quiz.js</code>。它的职责是：把围栏块解析成题目对象 → 渲染成可交互的题 →
+收集答案 → 判分 → 写进度。</p>
+<h2 id="参数切分括号感知">参数切分：括号感知</h2>
+<p>函数题的用例长这样：</p>
+<pre><code class="language-text"><span class="n">cases</span><span class="o">:</span><span class="w"> </span><span class="o">|</span>
+<span class="w">  </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">]</span>
+<span class="w">  </span><span class="s">"a,b"</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s">"b,a"</span>
+</code></pre>
+<p>按逗号切分参数是必然的 —— 但<strong>不能切到括号里面</strong>。</p>
+<pre><code class="language-js"><span class="kd">function</span><span class="w"> </span><span class="nx">splitArgs</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[];</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nx">depth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="nx">cur</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">''</span><span class="p">;</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">ch</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nb">String</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">ch</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'['</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">ch</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'('</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">ch</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'{'</span><span class="p">)</span><span class="w"> </span><span class="nx">depth</span><span class="o">++</span><span class="p">;</span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">ch</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">']'</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">ch</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">')'</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">ch</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'}'</span><span class="p">)</span><span class="w"> </span><span class="nx">depth</span><span class="o">--</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">ch</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">','</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">depth</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="mf">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">out</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">cur</span><span class="p">.</span><span class="nx">trim</span><span class="p">());</span><span class="w"> </span><span class="nx">cur</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">''</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="nx">cur</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="nx">ch</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">cur</span><span class="p">.</span><span class="nx">trim</span><span class="p">())</span><span class="w"> </span><span class="nx">out</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">cur</span><span class="p">.</span><span class="nx">trim</span><span class="p">());</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">out</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+<p>不这样做，<code>[1,2,3]</code> 会被切成 <code>[&quot;[1&quot;, &quot;2&quot;, &quot;3]&quot;]</code> 三块残片。</p>
+<h2 id="一个反直觉的决定只按逗号切不支持空格">一个反直觉的决定：只按逗号切，不支持空格</h2>
+<p>曾经有作者（包括我自己写模板时）顺手写成 <code>1 2 -&gt; 3</code>。
+结果 <code>add(&quot;1 2&quot;)</code> 被调用，报「缺少参数 b」。</p>
+<p><strong>为什么不改成&quot;空格也切&quot;</strong>：那会破坏 <code>&quot;hello world&quot; -&gt; 5</code> 这类单参数字符串用例。
+字符串里天然有空格，一刀切下去所有带空格的字符串全废。</p>
+<p>这是两害相权。现在的处理是三层：</p>
+<ol>
+<li>所有官方模板都用逗号</li>
+<li>校验器拦截：cases 里出现「有空格但没逗号、也不是引号或括号包起来」的行 → 报错</li>
+<li>编辑器预览当场标黄，不用等发布</li>
+</ol>
+<h2 id="字面量转换">字面量转换</h2>
+<p>用例写的是 Python 字面量，要转成 JS 值才能调用：</p>
+<pre><code class="language-js"><span class="kd">function</span><span class="w"> </span><span class="nx">literal</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="sr">/^-?\d+$/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span><span class="w"> </span><span class="mf">10</span><span class="p">);</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'True'</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'None'</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'true'</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w">      </span><span class="c1">// JS 题用小写字面量</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="sr">/^".*"$/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nx">s</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">1</span><span class="p">);</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="sr">/^[[{]/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/'/g</span><span class="p">,</span><span class="w"> </span><span class="s1">'"'</span><span class="p">));</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">e</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">s</span><span class="p">);</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">e2</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">s</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+<p>两套布尔值都要认 —— Python 题写 <code>True</code>，JavaScript 题写 <code>true</code>。</p>
+<h2 id="随机结果题光判范围不够">随机结果题：光判范围不够</h2>
+<p>掷骰子这类函数每次返回值都不同，没法用精确值比对。所以支持两种语法：</p>
+<pre><code class="language-text"><span class="o">*</span><span class="mi">20</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mf">1..6</span><span class="w">       </span><span class="err">调用</span><span class="w"> </span><span class="mi">20</span><span class="w"> </span><span class="err">次，每次结果都要落在</span><span class="w"> </span><span class="mi">1</span><span class="o">~</span><span class="mi">6</span>
+</code></pre>
+<p>但<strong>只判范围挡得住越界，挡不住假随机</strong>：</p>
+<pre><code class="language-python"><span class="k">def</span><span class="w"> </span><span class="nf">roll</span><span class="p">():</span> <span class="k">return</span> <span class="mi">3</span>      <span class="c1"># 每次都在 1~6 里，但它根本不是随机</span>
+</code></pre>
+<p>所以区间用例还要检查<strong>结果是否真的出现了多种不同的值</strong>：</p>
+<pre><code class="language-python"><span class="n">__is_int</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lo</span><span class="p">)</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span> <span class="ow">and</span> <span class="nb">float</span><span class="p">(</span><span class="n">hi</span><span class="p">)</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span>
+<span class="n">__span</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hi</span><span class="p">)</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">lo</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">__is_int</span> <span class="k">else</span> <span class="mi">0</span>
+<span class="k">if</span> <span class="n">__is_int</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">__span</span> <span class="o">&lt;=</span> <span class="mi">10</span><span class="p">:</span>
+    <span class="n">__need</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">lo</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">hi</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">__enough</span> <span class="o">=</span> <span class="n">__need</span><span class="o">.</span><span class="n">issubset</span><span class="p">({</span><span class="nb">int</span><span class="p">(</span><span class="n">__x</span><span class="p">)</span> <span class="k">for</span> <span class="n">__x</span> <span class="ow">in</span> <span class="n">__vals</span> <span class="k">if</span> <span class="n">__in_range</span><span class="p">(</span><span class="n">__x</span><span class="p">,</span> <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span><span class="p">)})</span>
+    <span class="c1"># 骰子这类：要求每个整数都出现过</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">__enough</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">__distinct</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">repeat</span><span class="p">)</span>
+    <span class="c1"># 浮点或很宽的区间：至少 5 个不同值</span>
+</code></pre>
+<p>整数且区间宽度 ≤ 10（骰子、硬币这种）要求<strong>每个取值都出现过</strong>；
+其它情况（浮点、很宽的区间）至少 5 个不同值。</p>
+<p>不这么卡，<code>return 3</code> 就能骗过所有测试。</p>
+<h2 id="程序题把输出暴露成变量">程序题：把输出暴露成变量</h2>
+<p>程序题判的是&quot;打印了什么&quot;，不是&quot;返回了什么&quot;。做法是把 stdout 捕获下来，
+塞进一个叫 <code>__out</code> 的变量：</p>
+<pre><code class="language-js"><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">ns</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'__out'</span><span class="p">,</span><span class="w"> </span><span class="nx">buf</span><span class="p">);</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* 某些 proxy 不支持 set */</span><span class="w"> </span><span class="p">}</span>
+</code></pre>
+<p>然后测试就能写：</p>
+<pre><code class="language-python"><span class="k">assert</span> <span class="s2">"hello"</span> <span class="ow">in</span> <span class="n">__out</span>
+</code></pre>
+<h2 id="网页题的判分在-iframe-里">网页题的判分在 iframe 里</h2>
+<p>HTML / CSS / JS 题走 <code>web-runner.js</code>：把用户的代码拼成一个完整文档塞进
+<code>&lt;iframe&gt;</code>，然后在<strong>隔离环境里</strong>跑检查项。</p>
+<p>有几类检查是<strong>永远不成立</strong>的，写题时要避开：</p>
+<ul>
+<li><code>:hover</code> 伪类 —— JS 触发不了真实的鼠标悬停</li>
+<li><code>getComputedStyle</code> 取 <code>height: auto</code> —— 算出来是具体像素值，不是 <code>auto</code></li>
+<li><code>&lt;button&gt;</code> 的默认字号 —— 各浏览器不统一（Chrome 是 13.333px）</li>
+</ul>
+<h2 id="local-与-project-是自评">local 与 project 是自评</h2>
+<p>这两种题型<strong>没有自动判分</strong>（浏览器里没法验证&quot;你在本地跑通了没有&quot;）。
+它们渲染成一个清单，作者勾完点「完成」。</p>
+<p>校验器会把它们算进题数，但<strong>不会去检查清单内容</strong> —— 那本来就是主观的。</p>
+
+      <div class="pager"><a href="../architecture/"><small>← 上一页</small><b>整体架构</b></a><a class="next" href="../code-runner/"><small>下一页 →</small><b>代码执行沙箱</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>
