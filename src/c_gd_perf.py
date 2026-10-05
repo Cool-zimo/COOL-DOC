@@ -168,6 +168,81 @@ POST blobs ×7 · GET ref ×1 · GET commit ×1 · POST tree ×1 · POST commit 
 = 12 次调用  25.29s  7.91 MB/s  ✓ 回读逐字节一致
 ```
 
+## 并发到底该开多大：实测拐点
+
+用第二个账号做了一轮**多组重复、取中位数**的测试（单次测量噪声很大，
+同一配置能差 2 倍，所以每组跑 3 次取中位数）。
+
+64MB，固定并发 4，只变片数：
+
+```
+16MB × 4 片    7.89s   8.11 MB/s   ← 最快
+8MB  × 8 片   12.04s   5.31 MB/s
+4MB  × 16 片  28.05s   2.28 MB/s   ← 慢 3.5 倍
+```
+
+**片数越少越快，即使单片变大。** 这跟"多分片能更好并行"的直觉相反——
+因为每片那 1~2 秒固定开销是按片数付的，而单片变大后传输本身几乎不增加耗时
+（带宽不是瓶颈）。
+
+并发本身确实有用，看看 4MB × 16 片这组：
+
+```
+并发 4    28.05s   2.28 MB/s
+并发 8    12.84s   4.98 MB/s
+并发 16    8.59s   7.45 MB/s
+```
+
+但**再往上会劣化**：单独测过并发 24，从 14.63s 掉到 20.52s。GitHub 那一侧
+开始拒绝排队，重试反而拖慢整体。所以并发硬上限定 **16**。
+
+综合两组数据的结论：
+
+```
+片数 ≈ 4（尽量少）  →  决定了大部分收益
+并发 = 片数，但不超过 16  →  次要收益
+```
+
+## 三个参数怎么同时定：内存也是约束
+
+并发数不能只看速度，还得看内存。base64 膨胀 1.34 倍，同时编码 N 个分片
+就要 `N × chunkSize × 1.34` 字节。
+
+所以算法分三步：
+
+```python
+chunkSize = clamp(size / 4, MIN_CHUNK=1MB, MAX_CHUNK=32MB)
+totalChunks = ceil(size / chunkSize)
+maxByMemory = floor(MEM_BUDGET / (chunkSize * 1.34))   # 默认预算 512MB
+concurrency = min(totalChunks, maxByMemory, HARD_CONC=16)
+```
+
+**这三个参数是互相牵制的** —— 单片越大，内存允许的同时编码数就越少：
+
+| 文件 | 单片 | 片数 | 并发 | 批次 | 峰值内存 |
+|---|---|---|---|---|---|
+| 8MB | 2MB | 4 | 4 | 1 | 11MB |
+| 64MB | 16MB | 4 | 4 | 1 | 86MB |
+| 256MB | 32MB | 8 | 8 | 1 | 343MB |
+| 512MB | 32MB | 16 | **11** | 2 | 472MB |
+| 1GB | 32MB | 32 | **11** | 3 | 472MB |
+| 4GB | 32MB | 128 | **11** | 12 | 472MB |
+
+512MB 以上，并发被**内存**压到 11 而不是 16 —— 32MB 的片同时编码 16 个
+要 672MB，实测会被系统杀掉。这就是为什么并发上限不能写死。
+
+## 自适应前后对比
+
+| 文件 | 旧（512KB 固定） | 新（自适应） | 提升 |
+|---|---|---|---|
+| 8MB | 88.75s · 112 次 | 15.67s · 9 次 | 5.7× |
+| 16MB | 182.09s · 224 次 | 11.53s · 9 次 | **15.8×** |
+| 128MB | ~41 分（外推） | **15.74s** · 9 次 | ~156× |
+| 512MB | ~1.6 小时（外推） | 66.23s | ~88× |
+| 1GB | ~3.2 小时（外推） | 136.72s | ~85× |
+
+128MB 那次 **9 次 API 调用、15.74 秒、8.13 MB/s**，回读逐字节一致。
+
 ## 内存：不能一次性全编码
 
 512MB 文件按 32MB 分片是 16 片，每片 base64 后 42MB。
@@ -381,6 +456,85 @@ lookup.
 POST blobs ×7 · GET ref ×1 · GET commit ×1 · POST tree ×1 · POST commit ×1 · PATCH ref ×1
 = 12 calls   25.29s  7.91 MB/s  ✓ readback byte-identical
 ```
+
+## How much concurrency is right: the measured inflection point
+
+A round of **repeated, median-of-3** tests was run on a second account. Single
+measurements are extremely noisy — the same config varies by 2× — so every
+configuration was run three times and the median taken.
+
+64MB, concurrency fixed at 4, only chunk count varying:
+
+```
+16MB × 4 chunks    7.89s   8.11 MB/s   ← fastest
+8MB  × 8 chunks   12.04s   5.31 MB/s
+4MB  × 16 chunks  28.05s   2.28 MB/s   ← 3.5× slower
+```
+
+**Fewer chunks is faster, even as each chunk grows.** This contradicts the intuition
+that "more chunks parallelise better" — because the 1–2s fixed cost is paid per chunk,
+while transferring a bigger chunk costs barely more (bandwidth isn't the bottleneck).
+
+Concurrency does help. Same 4MB × 16-chunk group:
+
+```
+conc 4    28.05s   2.28 MB/s
+conc 8    12.84s   4.98 MB/s
+conc 16    8.59s   7.45 MB/s
+```
+
+But **pushing further backfires**: concurrency 24 was tested separately and regressed
+from 14.63s to 20.52s. GitHub starts shedding queued requests, and the retries slow
+everything down. Hence the hard cap of **16**.
+
+Combined conclusion:
+
+```
+chunk count ≈ 4 (as few as possible)  →  most of the gain
+concurrency = chunk count, capped at 16  →  secondary gain
+```
+
+## Three parameters, decided together: memory is a constraint too
+
+Concurrency isn't only about speed. Base64 inflates by 1.34×, so encoding N chunks
+simultaneously needs `N × chunkSize × 1.34` bytes resident.
+
+So the algorithm runs in three steps:
+
+```python
+chunkSize = clamp(size / 4, MIN_CHUNK=1MB, MAX_CHUNK=32MB)
+totalChunks = ceil(size / chunkSize)
+maxByMemory = floor(MEM_BUDGET / (chunkSize * 1.34))   # default budget 512MB
+concurrency = min(totalChunks, maxByMemory, HARD_CONC=16)
+```
+
+**The three parameters constrain each other** — bigger chunks mean fewer can be
+encoded at once:
+
+| File | Chunk | Chunks | Conc | Batches | Peak memory |
+|---|---|---|---|---|---|
+| 8MB | 2MB | 4 | 4 | 1 | 11MB |
+| 64MB | 16MB | 4 | 4 | 1 | 86MB |
+| 256MB | 32MB | 8 | 8 | 1 | 343MB |
+| 512MB | 32MB | 16 | **11** | 2 | 472MB |
+| 1GB | 32MB | 32 | **11** | 3 | 472MB |
+| 4GB | 32MB | 128 | **11** | 12 | 472MB |
+
+Above 512MB, concurrency is clamped by **memory** to 11 rather than 16 — encoding 16
+chunks of 32MB at once needs 672MB and gets OOM-killed. That's why the concurrency cap
+can't be a hard-coded number.
+
+## Before/after with adaptive planning
+
+| File | Old (fixed 512KB) | New (adaptive) | Gain |
+|---|---|---|---|
+| 8MB | 88.75s · 112 calls | 15.67s · 9 calls | 5.7× |
+| 16MB | 182.09s · 224 calls | 11.53s · 9 calls | **15.8×** |
+| 128MB | ~41 min (extrapolated) | **15.74s** · 9 calls | ~156× |
+| 512MB | ~1.6h (extrapolated) | 66.23s | ~88× |
+| 1GB | ~3.2h (extrapolated) | 136.72s | ~85× |
+
+That 128MB run: **9 API calls, 15.74 seconds, 8.13 MB/s**, read back byte-identical.
 
 ## Memory: never base64 everything at once
 
