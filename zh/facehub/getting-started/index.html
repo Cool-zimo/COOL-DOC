@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>快速开始 · FaceHub · COOL-DOC</title>
+<meta name="description" content="登录、加好友、发第一条加密消息。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/facehub/getting-started/">中</a><a class="" href="../../../en/facehub/getting-started/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="" href="../../../al/">AnyLearn · 通学万义</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="on" href="../../../facehub/">FaceHub</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#登录时会发生什么" style="padding-left:10px;font-size:13px">登录时会发生什么</a><a href="#加好友" style="padding-left:10px;font-size:13px">加好友</a><a href="#发消息" style="padding-left:10px;font-size:13px">发消息</a><a href="#备份密钥" style="padding-left:10px;font-size:13px">备份密钥</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">FaceHub</a><span>/</span>快速开始</div>
+    <article class="doc">
+      <h1>快速开始</h1>
+      <p class="lead">登录、加好友、发第一条加密消息。</p>
+      <p>打开 <a href="https://cool-zimo.github.io/FaceHub/">FaceHub</a>，用 GitHub Token 登录。</p>
+<h2 id="登录时会发生什么">登录时会发生什么</h2>
+<pre><code class="language-text">登录 → 生成 P-256 密钥对
+     → 把公钥写进 facehub-{你的用户名}/pk.json（公开仓库）
+</code></pre>
+<p><strong>公钥放在公开仓库里，这是刻意的。</strong> 任何人想给你发消息，直接读这个文件就行 ——
+<strong>你不需要在线</strong>。</p>
+<p>这和 Signal 的 prekey、PGP 的公钥服务器是同一个思路。</p>
+<h2 id="加好友">加好友</h2>
+<ul>
+<li>输入对方 GitHub 用户名</li>
+<li>应用读对方的 <code>pk.json</code> 拿到公钥</li>
+<li>双方自动建立加密会话</li>
+</ul>
+<h2 id="发消息">发消息</h2>
+<p>消息在发出前就加密，GitHub 上存的是密文。</p>
+<pre><code class="language-text">E2E1.&lt;iv_base64&gt;.&lt;ciphertext_base64&gt;
+</code></pre>
+<p><code>E2E1</code> 是版本号前缀。解密时如果不是这个前缀，就<strong>原样返回并标记 plain:true</strong> ——
+兼容早期未加密的消息。</p>
+<p><strong>每条消息用随机 IV</strong>，所以同一句话发两次，密文完全不同 ——
+不会泄露&quot;这两条消息内容一样&quot;。</p>
+<h2 id="备份密钥">备份密钥</h2>
+<p>设置里可以导出密钥备份。</p>
+<div class="tip tip-bad">
+<b>备份是明文的</b>
+<p>谁拿到这个文件，谁就能解密你的全部消息。界面上有提示，
+但请务必把它当私钥一样保管。</p>
+<p>为什么不加口令加密：会引入"忘了口令更惨"这个新问题。
+两害相权，宁可让你自己看好文件。</p>
+</div>
+
+<p>身份密钥丢了，<strong>全部历史消息都解不开</strong>。</p>
+
+      <div class="pager"><a style="visibility:hidden"></a><a class="next" href="../crypto/"><small>下一页 →</small><b>加密机制</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

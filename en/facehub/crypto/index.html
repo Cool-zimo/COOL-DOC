@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crypto design · FaceHub · COOL-DOC</title>
+<meta name="description" content="ECDH + HKDF + AES-GCM, and why no step can be skipped.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/facehub/crypto/">中</a><a class="on" href="../../../en/facehub/crypto/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="" href="../../../al/">AnyLearn</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="on" href="../../../facehub/">FaceHub</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#algorithms" style="padding-left:10px;font-size:13px">Algorithms</a><a href="#why-hkdf-is-required" style="padding-left:10px;font-size:13px">Why HKDF is required</a><a href="#why-gcm-and-not-cbc" style="padding-left:10px;font-size:13px">Why GCM and not CBC</a><a href="#fingerprint-diagnosis" style="padding-left:10px;font-size:13px">Fingerprint diagnosis</a><a href="#group-key-distribution" style="padding-left:10px;font-size:13px">Group key distribution</a><a href="#removing-a-member-order-matters" style="padding-left:24px;font-size:12.5px">Removing a member: order matters</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">FaceHub</a><span>/</span>Crypto design</div>
+    <article class="doc">
+      <h1>Crypto design</h1>
+      <p class="lead">ECDH + HKDF + AES-GCM, and why no step can be skipped.</p>
+      <h2 id="algorithms">Algorithms</h2>
+<table>
+<thead>
+<tr>
+  <th>Stage</th>
+  <th>Algorithm</th>
+  <th>Parameters</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Key agreement</td>
+  <td>ECDH</td>
+  <td>curve <strong>P-256</strong></td>
+</tr>
+<tr>
+  <td>Key derivation</td>
+  <td>HKDF</td>
+  <td>SHA-256, salt = both public keys, info = <code>'aes'</code></td>
+</tr>
+<tr>
+  <td>Message encryption</td>
+  <td>AES-GCM</td>
+  <td>256-bit, random 12-byte IV</td>
+</tr>
+</tbody>
+</table>
+<div class="tip tip-warn">
+<b>Early docs said X25519 — that was wrong</b>
+<p>The source uses P-256. Both are ECDH, but the curves and public key formats differ,
+and mixing them means you <b>never derive the same shared secret</b> — with no error,
+just messages that won't decrypt.</p>
+</div>
+
+<h2 id="why-hkdf-is-required">Why HKDF is required</h2>
+<p>The raw bits from ECDH <strong>cannot be used directly as an AES key</strong> — wrong length, and
+the randomness isn't uniformly distributed.</p>
+<pre><code class="language-text">ECDH raw bits → importKey('raw', bits, 'HKDF')
+              → deriveBits(HKDF, 256)   ← extract + expand
+              → importKey('raw', prk, 'AES-GCM')
+</code></pre>
+<h2 id="why-gcm-and-not-cbc">Why GCM and not CBC</h2>
+<p>GCM is AEAD: <strong>tampering causes decryption to fail outright</strong> rather than yielding
+plausible-looking garbage.</p>
+<p>CBC has no integrity check, so an attacker can modify ciphertext and produce content
+that looks legitimate — dangerous in a chat context.</p>
+<h2 id="fingerprint-diagnosis">Fingerprint diagnosis</h2>
+<pre><code class="language-js"><span class="k">await</span><span class="w"> </span><span class="nx">Crypto</span><span class="p">.</span><span class="nx">fingerprint</span><span class="p">(</span><span class="nx">pubB64</span><span class="p">)</span><span class="w">   </span><span class="c1">// → 'a1b2c3'</span>
+</code></pre>
+<p><strong>Why this exists</strong>: when keys fall out of sync, the two sides derive different shared
+secrets, which shows up as &quot;encryption works but every decryption fails&quot; —
+<strong>with no error at all</strong>.</p>
+<p>Printing and comparing fingerprints tells you instantly whether you're looking at the
+same key pair. It's the fastest way to debug an encryption problem.</p>
+<h2 id="group-key-distribution">Group key distribution</h2>
+<pre><code class="language-text"><span class="nv">creator</span><span class="w"> </span><span class="nv">generates</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="nv">group</span><span class="w"> </span><span class="nv">key</span><span class="w"> </span><span class="nv">gk</span>
+<span class="w">  </span>→<span class="w"> </span><span class="nv">wrap</span><span class="w"> </span><span class="nv">one</span><span class="w"> </span><span class="nv">copy</span><span class="w"> </span><span class="nv">with</span><span class="w"> </span><span class="s2">"own private + own public"</span><span class="w"> </span>→<span class="w"> </span><span class="nv">gk</span><span class="o">/</span>{<span class="nv">me</span>}.<span class="nv">json</span>
+<span class="w">  </span>→<span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">each</span><span class="w"> </span><span class="nv">member</span>:<span class="w"> </span><span class="nv">read</span><span class="w"> </span><span class="nv">their</span><span class="w"> </span><span class="nv">identity</span><span class="w"> </span><span class="nv">public</span><span class="w"> </span><span class="nv">key</span><span class="w"> </span>→<span class="w"> </span><span class="nv">wrap</span><span class="w"> </span>→<span class="w"> </span><span class="nv">gk</span><span class="o">/</span>{<span class="nv">member</span>}.<span class="nv">json</span>
+</code></pre>
+<div class="tip tip-note">
+<b>Every gk/{login}.json must carry byPub</b>
+<p>Unwrapping requires the <b>distributor's</b> public key — it can't be hard-coded to
+the creator, because whoever re-issues the group key may not be the creator.</p>
+</div>
+
+<h3 id="removing-a-member-order-matters">Removing a member: order matters</h3>
+<pre><code class="language-text">① write them into the member list      ← must come before distribution
+② distribute the group key to them
+③ rotate the group key                 ← so the removed person can't read later messages
+④ write the member list back
+⑤ revoke the repo collaborator         ← must be last
+</code></pre>
+<p>Do ⑤ early and the person gets kicked before receiving the new key, leaving a zombie
+member who can't decrypt anything.</p>
+
+      <div class="pager"><a href="../getting-started/"><small>← Previous</small><b>Getting started</b></a><a style="visibility:hidden"></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>
