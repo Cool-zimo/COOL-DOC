@@ -135,6 +135,39 @@ def plan(size):
 但代码行为一直没改 —— 直到这次实测才动。</p>
 </div>
 
+## 线上实装前后的真实对比
+
+上面是 Python 侧的对照实验。真正改到 `github_drive` 里之后，
+又跑了一次**完全真实的前后对比** —— 同一个 8MB 文件，同一台机器：
+
+```
+旧实现（512KB 固定分片，串行，每片一次完整提交）
+  16 片   88.75s   0.09 MB/s   112 次 API 调用
+
+新实现（动态分片，并发 4，全部挤进一次 tree + commit）
+  4 片    15.67s   0.51 MB/s     9 次 API 调用
+```
+
+**快 5.7 倍，API 调用减少 12 倍。**
+
+调用数从 112 降到 9 的原因，是旧实现每个分片要跑完整一套提交流程：
+
+```
+getRef → getCommit → createBlob → createTree → createCommit → updateRef
+                                            → 再 getFileContents 拿 sha
+                                              = 每片 7 次请求
+```
+
+新实现把后四步从"每片一次"改成"每个仓库一次"，
+并直接用 blob 的 sha（已实测它与 contents API 的文件 sha 完全相同），
+省掉最后那次查询。
+
+```python
+# 200MB 真实上传（并发 4，7 片 × 32MB）
+POST blobs ×7 · GET ref ×1 · GET commit ×1 · POST tree ×1 · POST commit ×1 · PATCH ref ×1
+= 12 次调用  25.29s  7.91 MB/s  ✓ 回读逐字节一致
+```
+
 ## 内存：不能一次性全编码
 
 512MB 文件按 32MB 分片是 16 片，每片 base64 后 42MB。
@@ -314,6 +347,40 @@ new: 4MB chunks, 4 of them      11.77s   1.36 MB/s
 <p>The default was always 512KB — anything over 512KB got split. The source comment
 carried the correction, but the behaviour never changed until these measurements.</p>
 </div>
+
+## Real before/after on the actual app
+
+The numbers above come from a Python-side controlled experiment. After porting the
+algorithm into `github_drive`, a **fully real before/after** was measured — same 8MB
+file, same machine:
+
+```
+old implementation (fixed 512KB chunks, serial, one full commit per chunk)
+  16 chunks   88.75s   0.09 MB/s   112 API calls
+
+new implementation (dynamic chunks, concurrency 4, everything in one tree + commit)
+  4 chunks    15.67s   0.51 MB/s     9 API calls
+```
+
+**5.7× faster, 12× fewer API calls.**
+
+Calls dropped from 112 to 9 because the old code ran a full commit sequence per chunk:
+
+```
+getRef → getCommit → createBlob → createTree → createCommit → updateRef
+                                            → then getFileContents just for the sha
+                                              = 7 requests per chunk
+```
+
+The new one moves the last four steps from "per chunk" to "per repo", and uses the blob
+sha directly (verified identical to the contents API file sha), dropping that final
+lookup.
+
+```python
+# real 200MB upload (concurrency 4, 7 chunks × 32MB)
+POST blobs ×7 · GET ref ×1 · GET commit ×1 · POST tree ×1 · POST commit ×1 · PATCH ref ×1
+= 12 calls   25.29s  7.91 MB/s  ✓ readback byte-identical
+```
 
 ## Memory: never base64 everything at once
 

@@ -17,7 +17,7 @@
 </header>
 <div class="scrim" id="scrim"></div>
 <div class="wrap">
-  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="" href="../../../al/">AnyLearn · 通学万义</a><a class="on" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../facehub/">FaceHub</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#实测结果" style="padding-left:10px;font-size:13px">实测结果</a><a href="#三个硬约束都是实测撞出来的" style="padding-left:10px;font-size:13px">三个硬约束（都是实测撞出来的）</a><a href="#一单个-blob-上限约-38mb" style="padding-left:24px;font-size:12.5px">一、单个 blob 上限约 38MB</a><a href="#二并发有帮助但有上限" style="padding-left:24px;font-size:12.5px">二、并发有帮助，但有上限</a><a href="#三commit-是固定约-57-秒与文件数无关" style="padding-left:24px;font-size:12.5px">三、commit 是固定约 5.7 秒，与文件数无关</a><a href="#算法" style="padding-left:10px;font-size:13px">算法</a><a href="#为什么片数--并发数而不是更多" style="padding-left:24px;font-size:12.5px">为什么片数 ≈ 并发数，而不是更多</a><a href="#为什么不固定一个最佳分片大小" style="padding-left:24px;font-size:12.5px">为什么不固定一个&quot;最佳分片大小&quot;</a><a href="#对比旧的-512kb-默认" style="padding-left:10px;font-size:13px">对比旧的 512KB 默认</a><a href="#内存不能一次性全编码" style="padding-left:10px;font-size:13px">内存：不能一次性全编码</a><a href="#完整性验证" style="padding-left:10px;font-size:13px">完整性验证</a><a href="#失败重试不能只认-429" style="padding-left:10px;font-size:13px">失败重试不能只认 429</a><a href="#一句话总结" style="padding-left:10px;font-size:13px">一句话总结</a></nav>
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="" href="../../../al/">AnyLearn · 通学万义</a><a class="on" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../facehub/">FaceHub</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#实测结果" style="padding-left:10px;font-size:13px">实测结果</a><a href="#三个硬约束都是实测撞出来的" style="padding-left:10px;font-size:13px">三个硬约束（都是实测撞出来的）</a><a href="#一单个-blob-上限约-38mb" style="padding-left:24px;font-size:12.5px">一、单个 blob 上限约 38MB</a><a href="#二并发有帮助但有上限" style="padding-left:24px;font-size:12.5px">二、并发有帮助，但有上限</a><a href="#三commit-是固定约-57-秒与文件数无关" style="padding-left:24px;font-size:12.5px">三、commit 是固定约 5.7 秒，与文件数无关</a><a href="#算法" style="padding-left:10px;font-size:13px">算法</a><a href="#为什么片数--并发数而不是更多" style="padding-left:24px;font-size:12.5px">为什么片数 ≈ 并发数，而不是更多</a><a href="#为什么不固定一个最佳分片大小" style="padding-left:24px;font-size:12.5px">为什么不固定一个&quot;最佳分片大小&quot;</a><a href="#对比旧的-512kb-默认" style="padding-left:10px;font-size:13px">对比旧的 512KB 默认</a><a href="#线上实装前后的真实对比" style="padding-left:10px;font-size:13px">线上实装前后的真实对比</a><a href="#内存不能一次性全编码" style="padding-left:10px;font-size:13px">内存：不能一次性全编码</a><a href="#完整性验证" style="padding-left:10px;font-size:13px">完整性验证</a><a href="#失败重试不能只认-429" style="padding-left:10px;font-size:13px">失败重试不能只认 429</a><a href="#一句话总结" style="padding-left:10px;font-size:13px">一句话总结</a></nav>
   <main class="main">
     <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
       <a href="../">GitHub Drive</a><span>/</span>传输性能与分片算法</div>
@@ -160,6 +160,28 @@ base64 有 33% 膨胀，所以 32MB 原始 ≈ 42.7MB payload。</p>
 但代码行为一直没改 —— 直到这次实测才动。</p>
 </div>
 
+<h2 id="线上实装前后的真实对比">线上实装前后的真实对比</h2>
+<p>上面是 Python 侧的对照实验。真正改到 <code>github_drive</code> 里之后，
+又跑了一次<strong>完全真实的前后对比</strong> —— 同一个 8MB 文件，同一台机器：</p>
+<pre><code class="language-text">旧实现（512KB 固定分片，串行，每片一次完整提交）
+  16 片   88.75s   0.09 MB/s   112 次 API 调用
+
+新实现（动态分片，并发 4，全部挤进一次 tree + commit）
+  4 片    15.67s   0.51 MB/s     9 次 API 调用
+</code></pre>
+<p><strong>快 5.7 倍，API 调用减少 12 倍。</strong></p>
+<p>调用数从 112 降到 9 的原因，是旧实现每个分片要跑完整一套提交流程：</p>
+<pre><code class="language-text">getRef → getCommit → createBlob → createTree → createCommit → updateRef
+                                            → 再 getFileContents 拿 sha
+                                              = 每片 7 次请求
+</code></pre>
+<p>新实现把后四步从&quot;每片一次&quot;改成&quot;每个仓库一次&quot;，
+并直接用 blob 的 sha（已实测它与 contents API 的文件 sha 完全相同），
+省掉最后那次查询。</p>
+<pre><code class="language-python"><span class="c1"># 200MB 真实上传（并发 4，7 片 × 32MB）</span>
+<span class="n">POST</span> <span class="n">blobs</span> <span class="err">×</span><span class="mi">7</span> <span class="err">·</span> <span class="n">GET</span> <span class="n">ref</span> <span class="err">×</span><span class="mi">1</span> <span class="err">·</span> <span class="n">GET</span> <span class="n">commit</span> <span class="err">×</span><span class="mi">1</span> <span class="err">·</span> <span class="n">POST</span> <span class="n">tree</span> <span class="err">×</span><span class="mi">1</span> <span class="err">·</span> <span class="n">POST</span> <span class="n">commit</span> <span class="err">×</span><span class="mi">1</span> <span class="err">·</span> <span class="n">PATCH</span> <span class="n">ref</span> <span class="err">×</span><span class="mi">1</span>
+<span class="o">=</span> <span class="mi">12</span> <span class="n">次调用</span>  <span class="mf">25.29</span><span class="n">s</span>  <span class="mf">7.91</span> <span class="n">MB</span><span class="o">/</span><span class="n">s</span>  <span class="err">✓</span> <span class="n">回读逐字节一致</span>
+</code></pre>
 <h2 id="内存不能一次性全编码">内存：不能一次性全编码</h2>
 <p>512MB 文件按 32MB 分片是 16 片，每片 base64 后 42MB。
 <strong>一次性全编码就是 16 × 42MB = 672MB 的 Python 字符串同时在内存里。</strong></p>
