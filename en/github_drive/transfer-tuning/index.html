@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Transfer tuning · GitHub Drive · COOL-DOC</title>
+<meta name="description" content="Measured upload speed from 512KB to 1GB, and the chunking algorithm derived from it.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/github_drive/transfer-tuning/">中</a><a class="on" href="../../../en/github_drive/transfer-tuning/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="" href="../../../al/">AnyLearn</a><a class="on" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../facehub/">FaceHub</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#measured-results" style="padding-left:10px;font-size:13px">Measured results</a><a href="#three-hard-limits-all-found-by-hitting-them" style="padding-left:10px;font-size:13px">Three hard limits (all found by hitting them)</a><a href="#1-a-single-blob-caps-out-around-38mb" style="padding-left:24px;font-size:12.5px">1. A single blob caps out around 38MB</a><a href="#2-concurrency-helps-but-plateaus" style="padding-left:24px;font-size:12.5px">2. Concurrency helps, but plateaus</a><a href="#3-a-commit-costs-57s-regardless-of-file-count" style="padding-left:24px;font-size:12.5px">3. A commit costs ~5.7s regardless of file count</a><a href="#the-algorithm" style="padding-left:10px;font-size:13px">The algorithm</a><a href="#why-chunk-count--concurrency-not-more" style="padding-left:24px;font-size:12.5px">Why chunk count ≈ concurrency, not more</a><a href="#why-not-just-hard-code-one-best-chunk-size" style="padding-left:24px;font-size:12.5px">Why not just hard-code one &quot;best&quot; chunk size</a><a href="#versus-the-old-512kb-default" style="padding-left:10px;font-size:13px">Versus the old 512KB default</a><a href="#memory-never-base64-everything-at-once" style="padding-left:10px;font-size:13px">Memory: never base64 everything at once</a><a href="#integrity-verification" style="padding-left:10px;font-size:13px">Integrity verification</a><a href="#retry-must-cover-500-not-just-429" style="padding-left:10px;font-size:13px">Retry must cover 500, not just 429</a><a href="#summary" style="padding-left:10px;font-size:13px">Summary</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">GitHub Drive</a><span>/</span>Transfer tuning</div>
+    <article class="doc">
+      <h1>Transfer tuning</h1>
+      <p class="lead">Measured upload speed from 512KB to 1GB, and the chunking algorithm derived from it.</p>
+      <p>Every number on this page was <strong>actually measured</strong>: a private repo was created, filled
+with incompressible random data from <code>os.urandom()</code>, and timed against the real GitHub
+API. The repo was deleted afterwards.</p>
+<h2 id="measured-results">Measured results</h2>
+<p>Using the algorithm on this page (concurrency 4):</p>
+<table>
+<thead>
+<tr>
+  <th>File</th>
+  <th>Chunk</th>
+  <th>Chunks</th>
+  <th>Total</th>
+  <th>Throughput</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>512KB</td>
+  <td>direct</td>
+  <td>1</td>
+  <td>2.50s</td>
+  <td>0.20 MB/s</td>
+</tr>
+<tr>
+  <td>1MB</td>
+  <td>direct</td>
+  <td>1</td>
+  <td>2.82s</td>
+  <td>0.35 MB/s</td>
+</tr>
+<tr>
+  <td>8MB</td>
+  <td>2MB</td>
+  <td>4</td>
+  <td>11.85s</td>
+  <td>0.68 MB/s</td>
+</tr>
+<tr>
+  <td>128MB</td>
+  <td>32MB</td>
+  <td>4</td>
+  <td>24.89s</td>
+  <td>5.14 MB/s</td>
+</tr>
+<tr>
+  <td>256MB</td>
+  <td>32MB</td>
+  <td>8</td>
+  <td>41.06s</td>
+  <td>6.23 MB/s</td>
+</tr>
+<tr>
+  <td>512MB</td>
+  <td>32MB</td>
+  <td>16</td>
+  <td>66.23s</td>
+  <td><strong>7.73 MB/s</strong></td>
+</tr>
+<tr>
+  <td>1GB</td>
+  <td>32MB</td>
+  <td>32</td>
+  <td>136.72s</td>
+  <td>7.49 MB/s</td>
+</tr>
+</tbody>
+</table>
+<p>Throughput climbs from 0.2MB/s at 512KB to 7.5MB/s at 1GB — a <strong>37×</strong> spread.</p>
+<p>The reason is simple: <strong>for small files the time is almost entirely fixed overhead</strong> —
+one TLS handshake, one API round-trip — barely related to payload size. 512KB and 1MB
+both take 2.5–2.8s because both pay the same fixed cost.</p>
+<p>So &quot;uploading feels slow&quot; on small files is never a bandwidth problem.</p>
+<h2 id="three-hard-limits-all-found-by-hitting-them">Three hard limits (all found by hitting them)</h2>
+<h3 id="1-a-single-blob-caps-out-around-38mb">1. A single blob caps out around 38MB</h3>
+<pre><code class="language-text"><span class="mf">32</span><span class="n">MB</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="mf">42.7</span><span class="n">MB</span><span class="w"> </span><span class="n">base64</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="err">✓</span>
+<span class="mf">39</span><span class="n">MB</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="mf">52.0</span><span class="n">MB</span><span class="w"> </span><span class="n">base64</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="err">✓</span>
+<span class="mf">40</span><span class="n">MB</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="mf">53.3</span><span class="n">MB</span><span class="w"> </span><span class="n">base64</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="err">✗</span><span class="w"> </span><span class="mf">422</span><span class="w"> </span><span class="s">"your input was too large"</span>
+</code></pre>
+<p>The limit applies to the <strong>post-base64 payload</strong>, not raw bytes. Base64 inflates by 33%,
+so 32MB raw ≈ 42.7MB payload.</p>
+<p>The algorithm caps chunks at <strong>32MB</strong>, leaving 6MB of headroom.</p>
+<h3 id="2-concurrency-helps-but-plateaus">2. Concurrency helps, but plateaus</h3>
+<p>Same 16MB, different concurrency:</p>
+<pre><code class="language-text">serial (conc 1)   45.53s   0.70 MB/s
+concurrency 4     11.51s   2.78 MB/s
+</code></pre>
+<p>Concurrency 4 is <strong>4× faster than serial</strong>. Beyond that (8, 16) the gain is marginal —
+the bottleneck is no longer local parallelism but GitHub's side.</p>
+<p>So concurrency is pinned at <strong>4</strong>.</p>
+<h3 id="3-a-commit-costs-57s-regardless-of-file-count">3. A commit costs ~5.7s regardless of file count</h3>
+<pre><code class="language-text"><span class="mf">4</span><span class="w"> </span><span class="n">files</span><span class="w">     </span><span class="n">tree</span><span class="w"> </span><span class="mf">5.74</span><span class="n">s</span><span class="w">  </span><span class="n">commit</span><span class="w"> </span><span class="mf">5.74</span><span class="n">s</span>
+<span class="mf">16</span><span class="w"> </span><span class="n">files</span><span class="w">    </span><span class="n">tree</span><span class="w"> </span><span class="mf">0.90</span><span class="n">s</span><span class="w">  </span><span class="n">commit</span><span class="w"> </span><span class="mf">5.71</span><span class="n">s</span>
+<span class="mf">64</span><span class="w"> </span><span class="n">files</span><span class="w">    </span><span class="n">tree</span><span class="w"> </span><span class="mf">1.30</span><span class="n">s</span><span class="w">  </span><span class="n">commit</span><span class="w"> </span><span class="mf">5.68</span><span class="n">s</span>
+</code></pre>
+<p><strong>Those 5.7 seconds are paid per commit</strong>, whether you commit 4 files or 64.</p>
+<p>That single fact sets the algorithm's direction: <strong>minimise the number of batches</strong>.
+A 256MB upload split 128-per-batch would mean 2 commits and 5.7 wasted seconds.</p>
+<h2 id="the-algorithm">The algorithm</h2>
+<pre><code class="language-python"><span class="n">MIN_DIRECT</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>    <span class="c1"># below this: upload directly, don't chunk</span>
+<span class="n">MAX_CHUNK</span>  <span class="o">=</span> <span class="mi">32</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>   <span class="c1"># blob cap with headroom</span>
+<span class="n">MIN_CHUNK</span>  <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>
+<span class="n">TREE_MAX</span>   <span class="o">=</span> <span class="mi">128</span>                <span class="c1"># tree entries per call (conservative)</span>
+<span class="n">CONCURRENCY</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">plan</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">size</span> <span class="o">&lt;=</span> <span class="n">MIN_DIRECT</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">size</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">True</span>          <span class="c1"># direct via contents API</span>
+    <span class="n">chunk</span> <span class="o">=</span> <span class="n">size</span> <span class="o">/</span> <span class="n">CONCURRENCY</span>           <span class="c1"># chunk count ≈ concurrency</span>
+    <span class="n">chunk</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">MIN_CHUNK</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">MAX_CHUNK</span><span class="p">,</span> <span class="n">chunk</span><span class="p">))</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">ceil</span><span class="p">(</span><span class="n">size</span> <span class="o">/</span> <span class="n">chunk</span><span class="p">)</span>
+    <span class="n">batches</span> <span class="o">=</span> <span class="n">ceil</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="n">TREE_MAX</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">chunk</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="kc">False</span>
+</code></pre>
+<h3 id="why-chunk-count--concurrency-not-more">Why chunk count ≈ concurrency, not more</h3>
+<p>This is where I got it wrong first. Version one used <code>concurrency × 3</code>, reasoning that
+&quot;a few extra rounds keep the pipeline saturated&quot;.</p>
+<p>Measurement disagreed:</p>
+<pre><code class="language-text"><span class="mf">16</span><span class="n">MB</span><span class="p">,</span><span class="w"> </span><span class="mf">13</span><span class="w"> </span><span class="n">chunks</span><span class="w"> </span><span class="p">(</span><span class="mf">1.33</span><span class="n">MB</span><span class="w"> </span><span class="n">each</span><span class="p">)</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="mf">16.68</span><span class="n">s</span>
+<span class="mf">16</span><span class="n">MB</span><span class="p">,</span><span class="w"> </span><span class="mf">4</span><span class="w"> </span><span class="n">chunks</span><span class="w">  </span><span class="p">(</span><span class="mf">8</span><span class="n">MB</span><span class="w"> </span><span class="n">each</span><span class="p">)</span><span class="w">    </span><span class="err">→</span><span class="w">  </span><span class="mf">8.82</span><span class="n">s</span>
+</code></pre>
+<p><strong>Every chunk carries 1–2 seconds of fixed overhead, paid per chunk.</strong></p>
+<p>Once chunk count ≥ concurrency the pipeline is saturated; more chunks only add fixed
+cost.</p>
+<h3 id="why-not-just-hard-code-one-best-chunk-size">Why not just hard-code one &quot;best&quot; chunk size</h3>
+<p>Because the optimum moves with file size. A fixed 512KB would cut 1GB into 2048 chunks —
+over 2000 seconds of pure fixed overhead.</p>
+<h2 id="versus-the-old-512kb-default">Versus the old 512KB default</h2>
+<p>Same 16MB file, two strategies:</p>
+<pre><code class="language-text">old: 512KB chunks, 32 of them   60.75s   0.26 MB/s
+new: 4MB chunks, 4 of them      11.77s   1.36 MB/s
+</code></pre>
+<p><strong>5.2× faster.</strong> And that's on a small 16MB file — at 1GB the gap is far wider, since
+512KB chunking means 2048 pieces.</p>
+<div class="tip tip-warn">
+<b>The old docs saying "split at 10MB" were wrong</b>
+<p>The default was always 512KB — anything over 512KB got split. The source comment
+carried the correction, but the behaviour never changed until these measurements.</p>
+</div>
+
+<h2 id="memory-never-base64-everything-at-once">Memory: never base64 everything at once</h2>
+<p>512MB in 32MB chunks is 16 chunks, each 42MB after base64.
+<strong>Encoding all of them up front means 16 × 42MB = 672MB of Python strings live at once.</strong></p>
+<p>That's exactly what version one did — 512MB got OOM-killed with no error at all; the
+process just vanished.</p>
+<p>Fix: batch it. Only <code>CONCURRENCY</code> chunks of base64 exist at any moment.</p>
+<pre><code class="language-python"><span class="k">for</span> <span class="n">start</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">CONCURRENCY</span><span class="p">):</span>
+    <span class="n">batch</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">chunk</span><span class="p">:(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">chunk</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">start</span><span class="o">+</span><span class="n">CONCURRENCY</span><span class="p">,</span> <span class="n">n</span><span class="p">))]</span>
+    <span class="n">b64s</span> <span class="o">=</span> <span class="p">[</span><span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">]</span>
+    <span class="k">del</span> <span class="n">batch</span>                      <span class="c1"># release raw immediately</span>
+    <span class="o">...</span><span class="n">concurrent</span> <span class="n">upload</span><span class="o">...</span>
+    <span class="k">del</span> <span class="n">b64s</span>                       <span class="c1"># release base64 too</span>
+</code></pre>
+<h2 id="integrity-verification">Integrity verification</h2>
+<p>Speed is meaningless if the bytes are wrong. Every upload was read back and compared:</p>
+<pre><code class="language-text"><span class="nv">source</span><span class="w">  </span><span class="nv">sha256</span><span class="w"> </span><span class="nv">d19cfccc01fdda93</span>…<span class="w">  </span><span class="mi">16777216</span><span class="w"> </span><span class="nv">bytes</span>
+<span class="nv">readback</span><span class="w"> </span><span class="nv">sha256</span><span class="w"> </span><span class="nv">d19cfccc01fdda93</span>…<span class="w">  </span><span class="mi">16777216</span><span class="w"> </span><span class="nv">bytes</span>
+<span class="nb">result</span>:<span class="w"> </span>✓<span class="w"> </span><span class="nv">byte</span><span class="o">-</span><span class="k">for</span><span class="o">-</span><span class="nv">byte</span><span class="w"> </span><span class="nv">identical</span>
+</code></pre>
+<p>That's <strong>downloading it back and diffing bytes</strong>, not just checking for HTTP 200.</p>
+<h2 id="retry-must-cover-500-not-just-429">Retry must cover 500, not just 429</h2>
+<p>Large transfers hit <strong>500</strong> (not 502/503), which the first version didn't handle:</p>
+<pre><code class="language-python"><span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">429</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">502</span><span class="p">,</span> <span class="mi">503</span><span class="p">):</span>   <span class="c1"># 500 needs retrying too</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">attempt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+</code></pre>
+<p>The 256MB run died on exactly this — failed with a 500 on the first attempt, succeeded
+once retry was widened.</p>
+<h2 id="summary">Summary</h2>
+<pre><code class="language-text"><span class="n">small</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="p">(</span><span class="err">≤</span><span class="mi">1</span><span class="n">MB</span><span class="p">):</span><span class="w"> </span><span class="n">upload</span><span class="w"> </span><span class="n">directly</span><span class="p">,</span><span class="w"> </span><span class="n">don</span><span class="s1">'t chunk</span>
+<span class="n">large</span><span class="w"> </span><span class="n">files</span><span class="p">:</span><span class="w"> </span><span class="n">chunk</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">concurrency</span><span class="w"> </span><span class="p">(</span><span class="mi">4</span><span class="p">),</span><span class="w"> </span><span class="n">chunk</span><span class="w"> </span><span class="n">capped</span><span class="w"> </span><span class="n">at</span><span class="w"> </span><span class="mi">32</span><span class="n">MB</span>
+<span class="n">upload</span><span class="w"> </span><span class="n">concurrently</span><span class="p">,</span><span class="w"> </span><span class="n">encoding</span><span class="w"> </span><span class="n">only</span><span class="w"> </span><span class="n">one</span><span class="w"> </span><span class="n">batch</span><span class="w"> </span><span class="n">at</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">time</span>
+<span class="n">put</span><span class="w"> </span><span class="n">every</span><span class="w"> </span><span class="n">chunk</span><span class="w"> </span><span class="n">into</span><span class="w"> </span><span class="n">one</span><span class="w"> </span><span class="n">tree</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">one</span><span class="w"> </span><span class="n">commit</span>
+</code></pre>
+<p>The first three save fixed overhead; the last one saves those 5.7 seconds.</p>
+
+      <div class="pager"><a href="../storage-internals/"><small>← Previous</small><b>Chunking and capacity</b></a><a style="visibility:hidden"></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

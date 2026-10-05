@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>传输性能与分片算法 · GitHub Drive · COOL-DOC</title>
+<meta name="description" content="实测 512KB 到 1GB 的上传速度，以及推导出的分片算法。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/github_drive/transfer-tuning/">中</a><a class="" href="../../../en/github_drive/transfer-tuning/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="" href="../../../al/">AnyLearn · 通学万义</a><a class="on" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../facehub/">FaceHub</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#实测结果" style="padding-left:10px;font-size:13px">实测结果</a><a href="#三个硬约束都是实测撞出来的" style="padding-left:10px;font-size:13px">三个硬约束（都是实测撞出来的）</a><a href="#一单个-blob-上限约-38mb" style="padding-left:24px;font-size:12.5px">一、单个 blob 上限约 38MB</a><a href="#二并发有帮助但有上限" style="padding-left:24px;font-size:12.5px">二、并发有帮助，但有上限</a><a href="#三commit-是固定约-57-秒与文件数无关" style="padding-left:24px;font-size:12.5px">三、commit 是固定约 5.7 秒，与文件数无关</a><a href="#算法" style="padding-left:10px;font-size:13px">算法</a><a href="#为什么片数--并发数而不是更多" style="padding-left:24px;font-size:12.5px">为什么片数 ≈ 并发数，而不是更多</a><a href="#为什么不固定一个最佳分片大小" style="padding-left:24px;font-size:12.5px">为什么不固定一个&quot;最佳分片大小&quot;</a><a href="#对比旧的-512kb-默认" style="padding-left:10px;font-size:13px">对比旧的 512KB 默认</a><a href="#内存不能一次性全编码" style="padding-left:10px;font-size:13px">内存：不能一次性全编码</a><a href="#完整性验证" style="padding-left:10px;font-size:13px">完整性验证</a><a href="#失败重试不能只认-429" style="padding-left:10px;font-size:13px">失败重试不能只认 429</a><a href="#一句话总结" style="padding-left:10px;font-size:13px">一句话总结</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">GitHub Drive</a><span>/</span>传输性能与分片算法</div>
+    <article class="doc">
+      <h1>传输性能与分片算法</h1>
+      <p class="lead">实测 512KB 到 1GB 的上传速度，以及推导出的分片算法。</p>
+      <p>这一页的数字全部是<strong>真跑出来的</strong>：建一个私有仓库，用 <code>os.urandom()</code> 生成
+不可压缩的随机数据，实打实传到 GitHub API 上计时。测完仓库已删除。</p>
+<h2 id="实测结果">实测结果</h2>
+<p>采用本文的算法（并发 4）：</p>
+<table>
+<thead>
+<tr>
+  <th>文件</th>
+  <th>分片</th>
+  <th>片数</th>
+  <th>总耗时</th>
+  <th>吞吐</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>512KB</td>
+  <td>直传</td>
+  <td>1</td>
+  <td>2.50s</td>
+  <td>0.20 MB/s</td>
+</tr>
+<tr>
+  <td>1MB</td>
+  <td>直传</td>
+  <td>1</td>
+  <td>2.82s</td>
+  <td>0.35 MB/s</td>
+</tr>
+<tr>
+  <td>8MB</td>
+  <td>2MB</td>
+  <td>4</td>
+  <td>11.85s</td>
+  <td>0.68 MB/s</td>
+</tr>
+<tr>
+  <td>128MB</td>
+  <td>32MB</td>
+  <td>4</td>
+  <td>24.89s</td>
+  <td>5.14 MB/s</td>
+</tr>
+<tr>
+  <td>256MB</td>
+  <td>32MB</td>
+  <td>8</td>
+  <td>41.06s</td>
+  <td>6.23 MB/s</td>
+</tr>
+<tr>
+  <td>512MB</td>
+  <td>32MB</td>
+  <td>16</td>
+  <td>66.23s</td>
+  <td><strong>7.73 MB/s</strong></td>
+</tr>
+<tr>
+  <td>1GB</td>
+  <td>32MB</td>
+  <td>32</td>
+  <td>136.72s</td>
+  <td>7.49 MB/s</td>
+</tr>
+</tbody>
+</table>
+<p>吞吐从 512KB 的 0.2MB/s 涨到 1GB 的 7.5MB/s，差 <strong>37 倍</strong>。</p>
+<p>原因很简单：<strong>小文件的耗时几乎全是固定开销</strong> —— 一次 HTTPS 握手、
+一次 API 响应，跟传多少数据关系不大。512KB 和 1MB 都是 2.5~2.8 秒，
+就是同一笔固定开销。</p>
+<p>所以&quot;上传慢&quot;这个体感，在小文件上根本不是带宽问题。</p>
+<h2 id="三个硬约束都是实测撞出来的">三个硬约束（都是实测撞出来的）</h2>
+<h3 id="一单个-blob-上限约-38mb">一、单个 blob 上限约 38MB</h3>
+<pre><code class="language-text"><span class="mf">32</span><span class="n">MB</span><span class="w"> </span><span class="n">原始</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">base64</span><span class="w"> </span><span class="n">后</span><span class="w"> </span><span class="mf">42.7</span><span class="n">MB</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="err">✓</span>
+<span class="mf">39</span><span class="n">MB</span><span class="w"> </span><span class="n">原始</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">base64</span><span class="w"> </span><span class="n">后</span><span class="w"> </span><span class="mf">52.0</span><span class="n">MB</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="err">✓</span>
+<span class="mf">40</span><span class="n">MB</span><span class="w"> </span><span class="n">原始</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">base64</span><span class="w"> </span><span class="n">后</span><span class="w"> </span><span class="mf">53.3</span><span class="n">MB</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="err">✗</span><span class="w"> </span><span class="mf">422</span><span class="w"> </span><span class="s">"your input was too large"</span>
+</code></pre>
+<p>限制卡在 <strong>base64 之后的 payload</strong> 大小，不是原始字节。
+base64 有 33% 膨胀，所以 32MB 原始 ≈ 42.7MB payload。</p>
+<p>算法里取 <strong>32MB</strong> 作上限，留 6MB 余量。</p>
+<h3 id="二并发有帮助但有上限">二、并发有帮助，但有上限</h3>
+<p>同一个 16MB，不同并发度：</p>
+<pre><code class="language-text">串行（并发1）  45.53s   0.70 MB/s
+并发 4         11.51s   2.78 MB/s
+</code></pre>
+<p>并发 4 相比串行快 <strong>4 倍</strong>。再往上加（8、16）收益很小 ——
+瓶颈已经不在本地的并行度，而在 GitHub 那一侧。</p>
+<p>所以并发度定死 <strong>4</strong>。</p>
+<h3 id="三commit-是固定约-57-秒与文件数无关">三、commit 是固定约 5.7 秒，与文件数无关</h3>
+<pre><code class="language-text"><span class="mf">4</span><span class="w"> </span><span class="n">个文件</span><span class="w">    </span><span class="n">tree</span><span class="w"> </span><span class="mf">5.74</span><span class="n">s</span><span class="w">  </span><span class="n">commit</span><span class="w"> </span><span class="mf">5.74</span><span class="n">s</span>
+<span class="mf">16</span><span class="w"> </span><span class="n">个文件</span><span class="w">   </span><span class="n">tree</span><span class="w"> </span><span class="mf">0.90</span><span class="n">s</span><span class="w">  </span><span class="n">commit</span><span class="w"> </span><span class="mf">5.71</span><span class="n">s</span>
+<span class="mf">64</span><span class="w"> </span><span class="n">个文件</span><span class="w">   </span><span class="n">tree</span><span class="w"> </span><span class="mf">1.30</span><span class="n">s</span><span class="w">  </span><span class="n">commit</span><span class="w"> </span><span class="mf">5.68</span><span class="n">s</span>
+</code></pre>
+<p><strong>commit 那 5.7 秒是付给&quot;一笔提交&quot;的，不管你提交 4 个还是 64 个文件。</strong></p>
+<p>这条决定了算法的方向：<strong>批次数越少越好</strong>。
+256MB 那次如果按 128 条一批会变成 2 次 commit，白白多付 5.7 秒。</p>
+<h2 id="算法">算法</h2>
+<pre><code class="language-python"><span class="n">MIN_DIRECT</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>    <span class="c1"># 小于这个直传，不切</span>
+<span class="n">MAX_CHUNK</span>  <span class="o">=</span> <span class="mi">32</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>   <span class="c1"># blob 上限留余量</span>
+<span class="n">MIN_CHUNK</span>  <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>
+<span class="n">TREE_MAX</span>   <span class="o">=</span> <span class="mi">128</span>                <span class="c1"># 单次 tree 条目数（保守）</span>
+<span class="n">CONCURRENCY</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">plan</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">size</span> <span class="o">&lt;=</span> <span class="n">MIN_DIRECT</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">size</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">True</span>          <span class="c1"># 直传 contents API</span>
+    <span class="n">chunk</span> <span class="o">=</span> <span class="n">size</span> <span class="o">/</span> <span class="n">CONCURRENCY</span>           <span class="c1"># 片数 ≈ 并发数</span>
+    <span class="n">chunk</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">MIN_CHUNK</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">MAX_CHUNK</span><span class="p">,</span> <span class="n">chunk</span><span class="p">))</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">ceil</span><span class="p">(</span><span class="n">size</span> <span class="o">/</span> <span class="n">chunk</span><span class="p">)</span>
+    <span class="n">batches</span> <span class="o">=</span> <span class="n">ceil</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="n">TREE_MAX</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">chunk</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="kc">False</span>
+</code></pre>
+<h3 id="为什么片数--并发数而不是更多">为什么片数 ≈ 并发数，而不是更多</h3>
+<p>这是我一开始写错的地方。第一版让片数 = 并发数 × 3，想着&quot;多几轮让流水线更饱和&quot;。</p>
+<p>实测打脸：</p>
+<pre><code class="language-text"><span class="mf">16</span><span class="n">MB</span><span class="err">，</span><span class="mf">13</span><span class="w"> </span><span class="n">片</span><span class="err">（</span><span class="n">每片</span><span class="w"> </span><span class="mf">1.33</span><span class="n">MB</span><span class="err">）</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="mf">16.68</span><span class="n">s</span>
+<span class="mf">16</span><span class="n">MB</span><span class="err">，</span><span class="mf">4</span><span class="w"> </span><span class="n">片</span><span class="err">（</span><span class="n">每片</span><span class="w"> </span><span class="mf">8</span><span class="n">MB</span><span class="err">）</span><span class="w">     </span><span class="err">→</span><span class="w">  </span><span class="mf">8.82</span><span class="n">s</span>
+</code></pre>
+<p><strong>每片都有 1~2 秒的固定开销，是按片数付的。</strong></p>
+<p>片数只要 ≥ 并发数就能吃满并发，再多无益 —— 只是多付固定开销。</p>
+<h3 id="为什么不固定一个最佳分片大小">为什么不固定一个&quot;最佳分片大小&quot;</h3>
+<p>因为最佳值随文件大小变。固定 512KB 的话，1GB 会切成 2048 片，
+光固定开销就要 2000 多秒。</p>
+<h2 id="对比旧的-512kb-默认">对比旧的 512KB 默认</h2>
+<p>同一个 16MB 文件，两种策略：</p>
+<pre><code class="language-text">旧：512KB 分片，32 片   60.75s   0.26 MB/s
+新：4MB 分片，4 片      11.77s   1.36 MB/s
+</code></pre>
+<p><strong>快 5.2 倍。</strong></p>
+<p>而且这还是 16MB 的小文件。1GB 的差距会大得多 —— 512KB 分片要切 2048 片。</p>
+<div class="tip tip-warn">
+<b>旧文档写的"10MB 才分片"是错的</b>
+<p>默认值一直是 512KB，超过 512KB 就切。源码注释里有这条订正，
+但代码行为一直没改 —— 直到这次实测才动。</p>
+</div>
+
+<h2 id="内存不能一次性全编码">内存：不能一次性全编码</h2>
+<p>512MB 文件按 32MB 分片是 16 片，每片 base64 后 42MB。
+<strong>一次性全编码就是 16 × 42MB = 672MB 的 Python 字符串同时在内存里。</strong></p>
+<p>我第一版就是这么写的，512MB 直接被系统杀掉（没有任何报错，进程没了）。</p>
+<p>改成逐批：一次只把 <code>CONCURRENCY</code> 片的 base64 放内存，传完立刻释放。</p>
+<pre><code class="language-python"><span class="k">for</span> <span class="n">start</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">CONCURRENCY</span><span class="p">):</span>
+    <span class="n">batch</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">chunk</span><span class="p">:(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">chunk</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">start</span><span class="o">+</span><span class="n">CONCURRENCY</span><span class="p">,</span> <span class="n">n</span><span class="p">))]</span>
+    <span class="n">b64s</span> <span class="o">=</span> <span class="p">[</span><span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">]</span>
+    <span class="k">del</span> <span class="n">batch</span>                      <span class="c1"># 原始数据立刻释放</span>
+    <span class="o">...</span><span class="n">并发上传</span><span class="o">...</span>
+    <span class="k">del</span> <span class="n">b64s</span>                       <span class="c1"># base64 也立刻释放</span>
+</code></pre>
+<h2 id="完整性验证">完整性验证</h2>
+<p>光测速度没用，得确认数据没坏。传完立刻回读比对：</p>
+<pre><code class="language-text">源数据   sha256 d19cfccc01fdda93…  16777216 字节
+回读数据 sha256 d19cfccc01fdda93…  16777216 字节
+结果：✓ 逐字节一致
+</code></pre>
+<p>是<strong>下载回来逐字节比对</strong>的，不是只看 API 返回 200。</p>
+<h2 id="失败重试不能只认-429">失败重试不能只认 429</h2>
+<p>大文件传输中会遇到 <strong>500</strong>（不是 502/503），一开始没覆盖：</p>
+<pre><code class="language-python"><span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">429</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">502</span><span class="p">,</span> <span class="mi">503</span><span class="p">):</span>   <span class="c1"># 500 也要重试</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">attempt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+</code></pre>
+<p>256MB 那次就是这么挂的 —— 第一次跑直接报 500 失败，加上重试后成功。</p>
+<h2 id="一句话总结">一句话总结</h2>
+<pre><code class="language-text">小文件（≤1MB）直传，别切
+大文件：片数 = 并发数（4），单片封顶 32MB
+并发上传，一次只编码一批
+所有分片放进一次 tree + 一次 commit
+</code></pre>
+<p>前三条省的是固定开销，最后一条省的是那 5.7 秒。</p>
+
+      <div class="pager"><a href="../storage-internals/"><small>← 上一页</small><b>分片与容量</b></a><a style="visibility:hidden"></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

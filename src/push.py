@@ -30,6 +30,7 @@ def main():
     extra = []   # 站点源码：改文档要用的脚本和内容文件
     for rel in ['build.py', 'gen.py', 'push.py', 'css.tpl',
                 'c_al.py', 'c_gd.py', 'c_rest.py', 'c_facehub.py',
+                'c_al_tech.py', 'c_tech2.py', 'c_gd_perf.py',
                 'tools/check-links.py', 'tools/scan-pages.py', 'tools/make-landing.py']:
         fp = os.path.join('/data/workspace/cooldoc', rel)
         if os.path.exists(fp):
