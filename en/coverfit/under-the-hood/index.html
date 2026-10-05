@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Under the hood · CoverFit · COOL-DOC</title>
+<meta name="description" content="Why BMP and ICO encoders are hand-written.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/coverfit/under-the-hood/">中</a><a class="on" href="../../../en/coverfit/under-the-hood/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="" href="../../../al/">AnyLearn</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="on" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#hand-written-encoders" style="padding-left:10px;font-size:13px">Hand-written encoders</a><a href="#format-support-is-probed-not-sniffed" style="padding-left:10px;font-size:13px">Format support is probed, not sniffed</a><a href="#export-results-are-verified" style="padding-left:10px;font-size:13px">Export results are verified</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">CoverFit</a><span>/</span>Under the hood</div>
+    <article class="doc">
+      <h1>Under the hood</h1>
+      <p class="lead">Why BMP and ICO encoders are hand-written.</p>
+      <h2 id="hand-written-encoders">Hand-written encoders</h2>
+<p>Only some browsers support <code>toBlob</code> for <strong>BMP</strong>, and <strong>no browser supports ICO</strong>.</p>
+<p>So the encoders for those two are written by hand. Without them, picking BMP or ICO
+would fail silently — the button does nothing, or you download a PNG named <code>.ico</code>.</p>
+<h2 id="format-support-is-probed-not-sniffed">Format support is probed, not sniffed</h2>
+<p>Rather than checking the User-Agent, a 1×1 canvas is actually encoded and the
+resulting <code>blob.type</code> inspected.</p>
+<div class="tip tip-warn">
+<b>Why checking for a return value isn't enough</b>
+<p>When <code>toBlob</code> doesn't support a format it <b>silently falls back to PNG</b>
+and still returns a value. Only inspecting <code>blob.type</code> reveals the truth.</p>
+<p>Formats your browser can't do are disabled with an explanation.</p>
+</div>
+
+<h2 id="export-results-are-verified">Export results are verified</h2>
+<p>Exported files are read back with Pillow and pixel-checked — not &quot;seems to work&quot;:</p>
+<ul>
+<li>transparent → JPEG really is white (255,255,255) in the transparent area</li>
+<li>large image → ICO really is scaled to 256×256 (larger is rejected by most parsers)</li>
+<li>hand-rolled BMP → decoded pixels match the source point by point</li>
+</ul>
+
+      <div class="pager"><a href="../getting-started/"><small>← Previous</small><b>How to use</b></a><a style="visibility:hidden"></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

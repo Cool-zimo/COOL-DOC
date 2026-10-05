@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Getting started · AnyLearn · COOL-DOC</title>
+<meta name="description" content="Sign in, pick a book, finish your first lesson.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/al/getting-started/">中</a><a class="on" href="../../../en/al/getting-started/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="on" href="../../../al/">AnyLearn</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#1-sign-in" style="padding-left:10px;font-size:13px">1. Sign in</a><a href="#2-pick-a-book" style="padding-left:10px;font-size:13px">2. Pick a book</a><a href="#3-take-a-lesson" style="padding-left:10px;font-size:13px">3. Take a lesson</a><a href="#4-notes" style="padding-left:10px;font-size:13px">4. Notes</a><a href="#5-review" style="padding-left:10px;font-size:13px">5. Review</a><a href="#6-next" style="padding-left:10px;font-size:13px">6. Next</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">AnyLearn</a><span>/</span>Getting started</div>
+    <article class="doc">
+      <h1>Getting started</h1>
+      <p class="lead">Sign in, pick a book, finish your first lesson.</p>
+      <h2 id="1-sign-in">1. Sign in</h2>
+<p>Open <a href="https://cool-zimo.github.io/al/en/">AnyLearn</a> and paste a GitHub Personal Access Token.</p>
+<ul>
+<li>GitHub → Settings → Developer settings → <strong>Personal access tokens</strong></li>
+<li>A <strong>Fine-grained token</strong> with only <code>Contents: Read and write</code> for 90 days is enough</li>
+<li>Paste it back and click verify</li>
+</ul>
+<blockquote>
+<p>The token lives in your browser's localStorage and is never sent anywhere else.
+This site is static — there is no backend that could receive it.</p>
+</blockquote>
+<p>Why sign in: official textbooks are readable without it, but <strong>third-party books are
+discovered by searching GitHub with your token</strong>. The unauthenticated API allows only
+60 requests/hour, which a handful of searches will exhaust; signed in you get 5,000.</p>
+<h2 id="2-pick-a-book">2. Pick a book</h2>
+<p>The home page is a card grid of every textbook. Click a cover to enter.</p>
+<ul>
+<li>The badge shows difficulty: beginner / intermediate / practical / review</li>
+<li>Third-party books carry a &quot;third-party&quot; tag</li>
+<li>The top search box looks through <strong>book titles and tables of contents</strong></li>
+</ul>
+<h2 id="3-take-a-lesson">3. Take a lesson</h2>
+<p>Every lesson is: title → a short lead → body → in-lesson practice → quiz.</p>
+<p><strong>The code really runs.</strong> Python blocks in the body are editable and runnable,
+executed by Pyodide inside your browser — not a screenshot, not a simulation,
+but actual CPython compiled to wasm.</p>
+<ul>
+<li><strong>In-lesson practice</strong>: does not count toward progress, it just checks you understood</li>
+<li><strong>Quiz (marked &quot;counts&quot;)</strong>: finishing it marks the lesson complete</li>
+</ul>
+<h2 id="4-notes">4. Notes</h2>
+<p>The right-hand panel holds notes, scoped to the lesson you're on.</p>
+<p>Notes sync to your own <strong>private repository</strong> <code>python-tutorial-notes</code>,
+so signing in on another device pulls them back. Without signing in they stay local.</p>
+<h2 id="5-review">5. Review</h2>
+<p>Completed lessons enter an Ebbinghaus queue:</p>
+<pre><code class="language-text"><span class="mf">1</span><span class="n">d</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="mf">2</span><span class="n">d</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="mf">4</span><span class="n">d</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="mf">7</span><span class="n">d</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="mf">15</span><span class="n">d</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="mf">30</span><span class="n">d</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="mf">60</span><span class="n">d</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">graduated</span>
+</code></pre>
+<p>Due lessons show up under &quot;Today's review&quot; in the sidebar. It isn't nagging you to
+study — it's pulling you back <strong>at the inflection point of the forgetting curve</strong>.</p>
+<h2 id="6-next">6. Next</h2>
+<ul>
+<li>Want to author a textbook → <a href="../write-book/">Write a book</a></li>
+<li>Need format details → <a href="../book-format/">Book format spec</a></li>
+<li>Something wrong → <a href="../faq/">FAQ</a></li>
+</ul>
+
+      <div class="pager"><a style="visibility:hidden"></a><a class="next" href="../how-it-works/"><small>Next →</small><b>How learning works</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

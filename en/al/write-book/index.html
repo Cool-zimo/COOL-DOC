@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Write a book · AnyLearn · COOL-DOC</title>
+<meta name="description" content="Three routes: import an article, write in the dev platform, or fork an existing book.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/al/write-book/">中</a><a class="on" href="../../../en/al/write-book/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="on" href="../../../al/">AnyLearn</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#route-1-import-a-markdown-article-fastest" style="padding-left:10px;font-size:13px">Route 1: import a Markdown article (fastest)</a><a href="#route-2-write-by-hand-in-the-dev-platform" style="padding-left:10px;font-size:13px">Route 2: write by hand in the dev platform</a><a href="#snippet-library" style="padding-left:24px;font-size:12.5px">Snippet library</a><a href="#where-drafts-live" style="padding-left:24px;font-size:12.5px">Where drafts live</a><a href="#route-3-import-an-existing-book" style="padding-left:10px;font-size:13px">Route 3: import an existing book</a><a href="#after-any-of-the-three" style="padding-left:10px;font-size:13px">After any of the three</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">AnyLearn</a><span>/</span>Write a book</div>
+    <article class="doc">
+      <h1>Write a book</h1>
+      <p class="lead">Three routes: import an article, write in the dev platform, or fork an existing book.</p>
+      <h2 id="route-1-import-a-markdown-article-fastest">Route 1: import a Markdown article (fastest)</h2>
+<p>Already have notes, a blog post, a talk script? Turn it into a book directly.</p>
+<p>Dev platform → <strong>&quot;Import from article&quot;</strong> → paste Markdown or drop a <code>.md</code> file.</p>
+<p>Splitting rules:</p>
+<table>
+<thead>
+<tr>
+  <th>Article structure</th>
+  <th>Becomes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Both h1 and h2</td>
+  <td>h1 = chapter, h2 = lesson</td>
+</tr>
+<tr>
+  <td>Only h1</td>
+  <td>each h1 is a lesson</td>
+</tr>
+<tr>
+  <td>No headings at all</td>
+  <td>chunked every 700 characters</td>
+</tr>
+</tbody>
+</table>
+<p>Imported books default to <code>kind: notes</code> (no question requirement), since an article
+has none. To make it a real textbook, switch <code>kind</code> to <code>textbook</code> and add questions.</p>
+<div class="tip tip-note">
+<b>A # inside a code block is not a heading</b>
+<p>Writing <code># wrong way</code> as a Python comment is common. If heading scanning
+doesn't skip code fences, one article with comments gets split into dozens of "lessons".</p>
+</div>
+
+<h2 id="route-2-write-by-hand-in-the-dev-platform">Route 2: write by hand in the dev platform</h2>
+<p>The dev platform is a three-pane editor: chapter tree on the left, Markdown in the
+middle, live preview on the right.</p>
+<ul>
+<li>Add chapters and lessons freely, click titles to rename</li>
+<li>Preview refreshes 400ms after you stop typing</li>
+<li><strong>Questions in the preview actually work</strong> — choices are clickable, functions really run</li>
+</ul>
+<p>Preview questions are namespaced with a <code>__dev__:</code> prefix so they <strong>don't write to
+your progress and don't trigger review scheduling</strong>. Otherwise testing your own draft
+question would be recorded as real studying and pollute your progress.</p>
+<h3 id="snippet-library">Snippet library</h3>
+<p>The &quot;Snippet library&quot; button in the top bar has 11 ready-made question templates;
+click to insert at the cursor. A switch decides whether it's inserted as practice or
+as a graded question.</p>
+<p>You can also save your own questions as snippets — select a quiz block and click
+&quot;Save as snippet&quot;. They live in your private draft repo <code>al-drafts</code>, synced across devices.</p>
+<h3 id="where-drafts-live">Where drafts live</h3>
+<p>The first time you open the dev platform it creates <code>yourname/al-drafts</code>, a <strong>private
+repository</strong>. Auto-saves to the cloud 3 seconds after you stop editing; click &quot;Pull
+from cloud&quot; on another device.</p>
+<pre><code class="language-text">drafts/{id}/meta.json
+drafts/{id}/lessons/01.md
+drafts/{id}/lessons/test-01.md
+</code></pre>
+<h2 id="route-3-import-an-existing-book">Route 3: import an existing book</h2>
+<p>Dev platform → &quot;Import existing book&quot; → paste <code>owner/repo</code> or pick from the list.</p>
+<p>This creates a new draft you can edit freely. Original author info is kept — credit
+per the license.</p>
+<h2 id="after-any-of-the-three">After any of the three</h2>
+<p>All of them go through the same <a href="../publish/">review &amp; publish</a> flow.</p>
+
+      <div class="pager"><a href="../quiz-types/"><small>← Previous</small><b>Question types &amp; grading</b></a><a class="next" href="../publish/"><small>Next →</small><b>Review &amp; publish</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

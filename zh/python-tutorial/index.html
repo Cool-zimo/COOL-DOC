@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Python 从零到进阶 · COOL-DOC</title>
+<meta name="description" content="AnyLearn 的中文单本站，同样能在页面里跑代码。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../zh/python-tutorial/">中</a><a class="" href="../../en/python-tutorial/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="" href="../../al/">AnyLearn · 通学万义</a><a class="" href="../../github_drive/">GitHub Drive</a><a class="" href="../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../coverfit/">CoverFit</a><a class="on" href="../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../tiny-md/">tiny-md</a><a class="" href="../../more/">其它工具</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../">COOL-DOC</a><span>/</span>Python 从零到进阶</div>
+    <article class="doc">
+      <h1>Python 从零到进阶</h1>
+      <p class="lead">AnyLearn 的中文单本站，同样能在页面里跑代码。</p>
+      <div class="cards"><a class="card" href="index/"><b>介绍</b><span>和 AnyLearn 什么关系、适合谁。</span><span class="go">阅读 →</span></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

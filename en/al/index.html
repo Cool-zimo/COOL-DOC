@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AnyLearn · COOL-DOC</title>
+<meta name="description" content="Programming tutorials where code actually runs in your browser — with notes and spaced repetition.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../zh/al/">中</a><a class="on" href="../../en/al/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="on" href="../../al/">AnyLearn</a><a class="" href="../../github_drive/">GitHub Drive</a><a class="" href="../../cangshu/">Cangshu</a><a class="" href="../../coverfit/">CoverFit</a><a class="" href="../../python-tutorial/">Python from zero</a><a class="" href="../../tiny-md/">tiny-md</a><a class="" href="../../more/">Other tools</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../">COOL-DOC</a><span>/</span>AnyLearn</div>
+    <article class="doc">
+      <h1>AnyLearn</h1>
+      <p class="lead">Programming tutorials where code actually runs in your browser — with notes and spaced repetition.</p>
+      <div class="cards"><a class="card" href="getting-started/"><b>Getting started</b><span>Sign in, pick a book, finish your first lesson.</span><span class="go">Read →</span></a><a class="card" href="how-it-works/"><b>How learning works</b><span>Why code runs, how progress is counted, how review is scheduled, and what the guardian does.</span><span class="go">Read →</span></a><a class="card" href="book-format/"><b>Book format spec</b><span>Field requirements for albook.json, toc.json, lessons and questions.</span><span class="go">Read →</span></a><a class="card" href="quiz-types/"><b>Question types &amp; grading</b><span>All nine question types, how each is graded, and the easiest ways to get them wrong.</span><span class="go">Read →</span></a><a class="card" href="write-book/"><b>Write a book</b><span>Three routes: import an article, write in the dev platform, or fork an existing book.</span><span class="go">Read →</span></a><a class="card" href="publish/"><b>Review &amp; publish</b><span>How to read the review report, what publishing does, and why a book might not show up.</span><span class="go">Read →</span></a><a class="card" href="faq/"><b>FAQ</b><span>Sign-in, rate limits, search, and missing books.</span><span class="go">Read →</span></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

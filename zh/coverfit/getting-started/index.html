@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>怎么用 · CoverFit · COOL-DOC</title>
+<meta name="description" content="拖入图片、选比例、导出。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/coverfit/getting-started/">中</a><a class="" href="../../../en/coverfit/getting-started/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="" href="../../../al/">AnyLearn · 通学万义</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="on" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#导入" style="padding-left:10px;font-size:13px">导入</a><a href="#裁切" style="padding-left:10px;font-size:13px">裁切</a><a href="#格式" style="padding-left:10px;font-size:13px">格式</a><a href="#尺寸" style="padding-left:10px;font-size:13px">尺寸</a><a href="#批量" style="padding-left:10px;font-size:13px">批量</a><a href="#隐私" style="padding-left:10px;font-size:13px">隐私</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">CoverFit</a><span>/</span>怎么用</div>
+    <article class="doc">
+      <h1>怎么用</h1>
+      <p class="lead">拖入图片、选比例、导出。</p>
+      <p>打开 <a href="https://cool-zimo.github.io/coverfit/">CoverFit</a>。</p>
+<h2 id="导入">导入</h2>
+<p>三种方式都行：</p>
+<ul>
+<li><strong>拖入</strong>文件（支持多张）</li>
+<li><strong>点选</strong>文件</li>
+<li><strong>Ctrl+V</strong> 粘贴剪贴板里的图</li>
+</ul>
+<h2 id="裁切">裁切</h2>
+<p>11 种预设比例：</p>
+<table>
+<thead>
+<tr>
+  <th>比例</th>
+  <th>常见用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>1:1</td>
+  <td>头像</td>
+</tr>
+<tr>
+  <td>16:9</td>
+  <td>视频封面</td>
+</tr>
+<tr>
+  <td>3:4</td>
+  <td>小红书</td>
+</tr>
+<tr>
+  <td>2.35:1</td>
+  <td>公众号封面</td>
+</tr>
+<tr>
+  <td>1.91:1</td>
+  <td>分享卡片</td>
+</tr>
+</tbody>
+</table>
+<p>也可以自定义。裁切框可拖可缩放，锁比例时另一边跟着走。</p>
+<h2 id="格式">格式</h2>
+<p>PNG / JPEG / WebP / GIF / BMP / ICO / AVIF。</p>
+<div class="tip tip-note">
+<b>透明图转 JPEG 会变白，不是变黑</b>
+<p>JPEG 不支持透明通道，必须填一个底色。填黑会让 logo 边缘发黑，
+所以这里填白。</p>
+</div>
+
+<h2 id="尺寸">尺寸</h2>
+<p>原尺寸 / ≤4096 / ≤2048 / ≤1200 / ≤800 / 指定宽度。</p>
+<h2 id="批量">批量</h2>
+<p>一次拖多张，每张保留自己的裁切框，可一键全部导出。</p>
+<h2 id="隐私">隐私</h2>
+<p>图片<strong>不上传服务器</strong>。全部在浏览器里用 Canvas 处理，断网也能用。</p>
+
+      <div class="pager"><a style="visibility:hidden"></a><a class="next" href="../under-the-hood/"><small>下一页 →</small><b>实现细节</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

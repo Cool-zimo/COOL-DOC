@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>怎么用 · tiny-md · COOL-DOC</title>
+<meta name="description" content="两种方式：JS 调用 和 纯 HTML 内联。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/tiny-md/getting-started/">中</a><a class="" href="../../../en/tiny-md/getting-started/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="" href="../../../al/">AnyLearn · 通学万义</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="on" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#用-js" style="padding-left:10px;font-size:13px">用 JS</a><a href="#不想写-js" style="padding-left:10px;font-size:13px">不想写 JS</a><a href="#演示" style="padding-left:10px;font-size:13px">演示</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">tiny-md</a><span>/</span>怎么用</div>
+    <article class="doc">
+      <h1>怎么用</h1>
+      <p class="lead">两种方式：JS 调用 和 纯 HTML 内联。</p>
+      <h2 id="用-js">用 JS</h2>
+<pre><code class="language-js"><span class="kd">const</span><span class="w"> </span><span class="nx">TinyMD</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">'tiny-md'</span><span class="p">);</span>
+<span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">'out'</span><span class="p">).</span><span class="nx">innerHTML</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">TinyMD</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
+</code></pre>
+<p>只高亮代码：</p>
+<pre><code class="language-js"><span class="nx">TinyMD</span><span class="p">.</span><span class="nx">highlight</span><span class="p">(</span><span class="s1">'const x = 1;'</span><span class="p">,</span><span class="w"> </span><span class="s1">'js'</span><span class="p">);</span>
+</code></pre>
+<h2 id="不想写-js">不想写 JS</h2>
+<pre><code class="language-html"><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">"https://cdn.jsdelivr.net/gh/Cool-zimo/tiny-md/tiny-md.js"</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">"text/tiny-md"</span><span class="p">&gt;</span>
+<span class="err">#</span><span class="w"> </span><span class="nx">直接写</span><span class="w"> </span><span class="nx">Markdown</span>
+<span class="nx">公式</span><span class="w"> </span><span class="nx">$x</span><span class="o">^</span><span class="mf">2</span><span class="nx">$</span><span class="w"> </span><span class="nx">也能渲染</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</code></pre>
+<h2 id="演示">演示</h2>
+<p><a href="https://cool-zimo.github.io/tiny-md/demo.html">在线演示</a></p>
+
+      <div class="pager"><a style="visibility:hidden"></a><a class="next" href="../design/"><small>下一页 →</small><b>设计取舍</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

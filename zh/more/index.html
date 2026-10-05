@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>其它工具 · COOL-DOC</title>
+<meta name="description" content="gdpy、本地服务端、插件市场、修仙模拟器、fengjson、Cat Sigma。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../zh/more/">中</a><a class="" href="../../en/more/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="" href="../../al/">AnyLearn · 通学万义</a><a class="" href="../../github_drive/">GitHub Drive</a><a class="" href="../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../coverfit/">CoverFit</a><a class="" href="../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../tiny-md/">tiny-md</a><a class="on" href="../../more/">其它工具</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../">COOL-DOC</a><span>/</span>其它工具</div>
+    <article class="doc">
+      <h1>其它工具</h1>
+      <p class="lead">gdpy、本地服务端、插件市场、修仙模拟器、fengjson、Cat Sigma。</p>
+      <div class="cards"><a class="card" href="index/"><b>一览</b><span>每个小工具一句话说明和入口。</span><span class="go">阅读 →</span></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

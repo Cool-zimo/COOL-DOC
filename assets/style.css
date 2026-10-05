@@ -44,8 +44,11 @@ a:hover{text-decoration:underline}
 .lang a:hover{text-decoration:none}
 .menu-btn{
   display:none;background:none;border:1px solid var(--line);border-radius:8px;
-  width:34px;height:32px;color:var(--dim);cursor:pointer;font-size:15px;
+  width:34px;height:32px;color:var(--dim);cursor:pointer;font-size:15px;flex:none;
 }
+/* 顶栏挤不下时优先牺牲 tagline —— 390px 下不藏的话语言切换会被顶出屏幕 */
+.top{overflow:hidden}
+.lang{flex:none}
 
 /* ---------- 布局 ---------- */
 .wrap{display:flex;max-width:1240px;margin:0 auto;align-items:flex-start}
@@ -160,6 +163,7 @@ footer a{color:var(--dim)}
 .scrim.on{display:block}
 
 @media(max-width:900px){
+  .brand small{display:none}
   .side{
     position:fixed;left:0;top:56px;bottom:0;z-index:45;background:var(--bg);
     transform:translateX(-100%);transition:.25s;border-right:1px solid var(--line);

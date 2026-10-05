@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Getting started · GitHub Drive · COOL-DOC</title>
+<meta name="description" content="Sign in, upload, download, share — a five-minute tour.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/github_drive/getting-started/">中</a><a class="on" href="../../../en/github_drive/getting-started/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="" href="../../../al/">AnyLearn</a><a class="on" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#1-sign-in" style="padding-left:10px;font-size:13px">1. Sign in</a><a href="#2-upload-files" style="padding-left:10px;font-size:13px">2. Upload files</a><a href="#3-upload-a-folder" style="padding-left:10px;font-size:13px">3. Upload a folder</a><a href="#4-manage-files" style="padding-left:10px;font-size:13px">4. Manage files</a><a href="#5-share-files" style="padding-left:10px;font-size:13px">5. Share files</a><a href="#6-plugins" style="padding-left:10px;font-size:13px">6. Plugins</a><a href="#7-cangshu-companion-app" style="padding-left:10px;font-size:13px">7. Cangshu (companion app)</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">GitHub Drive</a><span>/</span>Getting started</div>
+    <article class="doc">
+      <h1>Getting started</h1>
+      <p class="lead">Sign in, upload, download, share — a five-minute tour.</p>
+      <h2 id="1-sign-in">1. Sign in</h2>
+<p>Open <a href="https://cool-zimo.github.io/github_drive/">GitHub Drive</a>, enter a GitHub
+Personal Access Token (needs the <code>repo</code> scope), and click verify.</p>
+<blockquote>
+<p>The token is kept in your browser only and never uploaded anywhere.</p>
+</blockquote>
+<h2 id="2-upload-files">2. Upload files</h2>
+<ul>
+<li>Click &quot;Upload files&quot; in the toolbar and pick one or more files</li>
+<li>Or just drag files onto the page</li>
+<li>Large files are chunked automatically across several repositories</li>
+</ul>
+<h2 id="3-upload-a-folder">3. Upload a folder</h2>
+<ul>
+<li>Click &quot;Upload folder&quot; and choose a local folder</li>
+<li>Directory structure is preserved, uploaded recursively</li>
+</ul>
+<h2 id="4-manage-files">4. Manage files</h2>
+<ul>
+<li><strong>Double-click</strong> a folder to enter it, double-click a file to preview</li>
+<li><strong>Right-click</strong> a file: rename, move, copy, delete, favourite, share, download</li>
+<li><strong>Ctrl/Cmd + click</strong> to multi-select and act in bulk</li>
+<li><strong>Drag</strong> a file onto a folder or onto breadcrumb path to move it</li>
+</ul>
+<h2 id="5-share-files">5. Share files</h2>
+<ul>
+<li>Right-click a file → Share</li>
+<li>Fill in a name and description</li>
+<li>A public repository is created and GitHub Pages enabled automatically</li>
+<li>The share link works directly and supports downloading everything</li>
+</ul>
+<h2 id="6-plugins">6. Plugins</h2>
+<ul>
+<li>Sidebar → Plugin market</li>
+<li>Browse plugins and click &quot;Install&quot;</li>
+<li>Click &quot;Run&quot; to open it <strong>full screen</strong>; press <strong>ESC</strong> or the top-right &quot;✕&quot; to exit</li>
+</ul>
+<h2 id="7-cangshu-companion-app">7. Cangshu (companion app)</h2>
+<p>Cangshu is the companion repository management panel, showing your repos as cards.</p>
+<ul>
+<li>URL: <a href="https://cool-zimo.github.io/cangshu/">https://cool-zimo.github.io/cangshu/</a></li>
+<li><strong>Sign in once, both work</strong> — both apps are served from <code>cool-zimo.github.io</code>,
+so the token is shared in browser localStorage</li>
+<li>Each app's sidebar has a one-click jump to the other</li>
+</ul>
+
+      <div class="pager"><a style="visibility:hidden"></a><a class="next" href="../user-guide/"><small>Next →</small><b>User guide</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

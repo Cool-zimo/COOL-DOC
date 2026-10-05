@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>COOL-DOC · Cool-zimo 全部项目的文档</title>
+<meta name="description" content="Cool-zimo 全部项目的文档">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../zh/">中</a><a class="" href="../en/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="" href="../al/">AnyLearn · 通学万义</a><a class="" href="../github_drive/">GitHub Drive</a><a class="" href="../cangshu/">仓鼠 Cangshu</a><a class="" href="../coverfit/">CoverFit</a><a class="" href="../python-tutorial/">Python 从零到进阶</a><a class="" href="../tiny-md/">tiny-md</a><a class="" href="../more/">其它工具</a></nav>
+  <main class="main">
+    <article class="doc">
+      <h1>COOL-DOC</h1>
+      <p class="lead">Cool-zimo 全部项目的文档 · 中英双语</p>
+      <div class="cards"><a class="card" href="al/"><b>AnyLearn · 通学万义</b><span>浏览器里真跑代码的编程教程，会记笔记、按艾宾浩斯曲线安排复习。</span><span class="go">阅读 →</span></a><a class="card" href="github_drive/"><b>GitHub Drive</b><span>把 GitHub 仓库当网盘用：存文件、分片上传、一键分享、插件扩展。</span><span class="go">阅读 →</span></a><a class="card" href="cangshu/"><b>仓鼠 Cangshu</b><span>GitHub 仓库管理面板：卡片化、在线编辑、Pages 状态一目了然。</span><span class="go">阅读 →</span></a><a class="card" href="coverfit/"><b>CoverFit</b><span>图片裁切与格式转换，纯浏览器本地处理，不上传。</span><span class="go">阅读 →</span></a><a class="card" href="python-tutorial/"><b>Python 从零到进阶</b><span>AnyLearn 的中文单本站，同样能在页面里跑代码。</span><span class="go">阅读 →</span></a><a class="card" href="tiny-md/"><b>tiny-md</b><span>零依赖 Markdown + LaTeX 渲染器，公式不用打 $ 也能渲染。</span><span class="go">阅读 →</span></a><a class="card" href="more/"><b>其它工具</b><span>gdpy、本地服务端、插件市场、修仙模拟器、fengjson、Cat Sigma。</span><span class="go">阅读 →</span></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

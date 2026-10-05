@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>学习机制 · AnyLearn · 通学万义 · COOL-DOC</title>
+<meta name="description" content="代码为什么能真跑、进度怎么算、复习怎么排、节奏守护是什么。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/al/how-it-works/">中</a><a class="" href="../../../en/al/how-it-works/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="on" href="../../../al/">AnyLearn · 通学万义</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#代码是真跑的" style="padding-left:10px;font-size:13px">代码是真跑的</a><a href="#进度怎么算" style="padding-left:10px;font-size:13px">进度怎么算</a><a href="#艾宾浩斯复习" style="padding-left:10px;font-size:13px">艾宾浩斯复习</a><a href="#节奏守护" style="padding-left:10px;font-size:13px">节奏守护</a><a href="#笔记同步" style="padding-left:10px;font-size:13px">笔记同步</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">AnyLearn · 通学万义</a><span>/</span>学习机制</div>
+    <article class="doc">
+      <h1>学习机制</h1>
+      <p class="lead">代码为什么能真跑、进度怎么算、复习怎么排、节奏守护是什么。</p>
+      <h2 id="代码是真跑的">代码是真跑的</h2>
+<p>正文里的 Python 代码块由 <strong>Pyodide</strong> 执行 —— CPython 编译成 WebAssembly，
+跑在你的浏览器里。</p>
+<p>这意味着：</p>
+<ul>
+<li>有完整的标准库，<code>import</code> 真的能用</li>
+<li>报错是真的 Python 报错，不是编造的</li>
+<li>断网也能跑（Pyodide 加载过一次之后）</li>
+</ul>
+<p>代价是首次加载要下载约 10MB 的运行时。之后浏览器会缓存。</p>
+<h2 id="进度怎么算">进度怎么算</h2>
+<p>一课要<strong>做完标了「计入学完」的题目</strong>才算学完。随堂练习不计。</p>
+<p>判定标准来自题目上的 <code>exam: true</code> 标记。作者出题时决定哪道算数，
+所以一本书里&quot;学完&quot;的严格程度由作者控制。</p>
+<h2 id="艾宾浩斯复习">艾宾浩斯复习</h2>
+<p>学完的课进入复习队列，间隔按这条曲线：</p>
+<table>
+<thead>
+<tr>
+  <th>第几次复习</th>
+  <th>间隔</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>1</td>
+  <td>1 天</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td>2 天</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td>4 天</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td>7 天</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td>15 天</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td>30 天</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td>60 天</td>
+</tr>
+<tr>
+  <td>之后</td>
+  <td>毕业</td>
+</tr>
+</tbody>
+</table>
+<p>答对了推进到下一档，答错退回上一档。<strong>不是</strong>简单的&quot;学完就不管&quot;。</p>
+<h2 id="节奏守护">节奏守护</h2>
+<p>连续学习超过一定时长会弹一个休息提醒。</p>
+<p>这个设计的出发点很直接：编程教程最容易出现的失败模式不是学不会，
+是<strong>一次学太久然后彻底不想打开第二次</strong>。提醒是为了让你明天还愿意回来。</p>
+<p>可以在设置里关掉。</p>
+<h2 id="笔记同步">笔记同步</h2>
+<p>笔记存在你自己的私有仓库 <code>python-tutorial-notes</code>：</p>
+<pre><code class="language-text">notes/
+  {bookId}/
+    {lessonId}.md
+</code></pre>
+<p>用 Git Data API 的 <code>commitTree</code> 一次提交，要么全成要么全不成，不会留下半截状态。
+停止输入几秒后自动同步。</p>
+
+      <div class="pager"><a href="../getting-started/"><small>← 上一页</small><b>快速开始</b></a><a class="next" href="../book-format/"><small>下一页 →</small><b>教材格式规范</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

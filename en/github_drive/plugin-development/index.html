@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Plugin development · GitHub Drive · COOL-DOC</title>
+<meta name="description" content="Create a GD-Plugin-xxx repo and the market will find it.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/github_drive/plugin-development/">中</a><a class="on" href="../../../en/github_drive/plugin-development/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="" href="../../../al/">AnyLearn</a><a class="on" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#a-plugin-is-just-a-repository" style="padding-left:10px;font-size:13px">A plugin is just a repository</a><a href="#pluginjson" style="padding-left:10px;font-size:13px">plugin.json</a><a href="#what-you-can-use-in-the-page" style="padding-left:10px;font-size:13px">What you can use in the page</a><a href="#desktop-only-capabilities" style="padding-left:10px;font-size:13px">Desktop-only capabilities</a><a href="#publishing" style="padding-left:10px;font-size:13px">Publishing</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">GitHub Drive</a><span>/</span>Plugin development</div>
+    <article class="doc">
+      <h1>Plugin development</h1>
+      <p class="lead">Create a GD-Plugin-xxx repo and the market will find it.</p>
+      <h2 id="a-plugin-is-just-a-repository">A plugin is just a repository</h2>
+<p>Name the repository with a <code>GD-Plugin-</code> prefix and the market will find it automatically.</p>
+<pre><code class="language-text">GD-Plugin-MyTool/
+  plugin.json
+  index.html
+</code></pre>
+<h2 id="pluginjson">plugin.json</h2>
+<pre><code class="language-json"><span class="p">{</span>
+<span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MyTool"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.0.0"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"One line on what this plugin does"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"author"</span><span class="p">:</span><span class="w"> </span><span class="s2">"your-name"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"entry"</span><span class="p">:</span><span class="w"> </span><span class="s2">"index.html"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"icon"</span><span class="p">:</span><span class="w"> </span><span class="s2">"🧩"</span>
+<span class="p">}</span>
+</code></pre>
+<h2 id="what-you-can-use-in-the-page">What you can use in the page</h2>
+<p>Plugins run <strong>full screen</strong> in an iframe and talk to the host via <code>postMessage</code>.</p>
+<p>See <a href="https://github.com/Cool-zimo/GD-Plugin-CoolClock">GD-Plugin-CoolClock</a> as a
+reference — copy its structure and adapt.</p>
+<h2 id="desktop-only-capabilities">Desktop-only capabilities</h2>
+<p>Web plugins run in the browser sandbox and <strong>cannot touch the local filesystem</strong>.</p>
+<p>If you need to read/write local files or run system commands, use the
+<a href="https://github.com/Cool-zimo/github-drive-desktop">desktop app</a> or
+<a href="https://github.com/Cool-zimo/gdpy">gdpy</a>. Both have a permission model as a guardrail.</p>
+<h2 id="publishing">Publishing</h2>
+<p>Push to GitHub with a <code>GD-Plugin-</code> prefix. The market's search has some lag, so a
+freshly pushed plugin may take a few minutes to appear.</p>
+
+      <div class="pager"><a href="../user-guide/"><small>← Previous</small><b>User guide</b></a><a class="next" href="../faq/"><small>Next →</small><b>FAQ</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

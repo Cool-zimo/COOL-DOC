@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>插件开发 · GitHub Drive · COOL-DOC</title>
+<meta name="description" content="建一个 GD-Plugin-xxx 仓库就能被插件广场搜到。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/github_drive/plugin-development/">中</a><a class="" href="../../../en/github_drive/plugin-development/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="" href="../../../al/">AnyLearn · 通学万义</a><a class="on" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#插件就是一个仓库" style="padding-left:10px;font-size:13px">插件就是一个仓库</a><a href="#pluginjson" style="padding-left:10px;font-size:13px">plugin.json</a><a href="#页面里能用什么" style="padding-left:10px;font-size:13px">页面里能用什么</a><a href="#桌面版才有能力" style="padding-left:10px;font-size:13px">桌面版才有能力</a><a href="#发布" style="padding-left:10px;font-size:13px">发布</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">GitHub Drive</a><span>/</span>插件开发</div>
+    <article class="doc">
+      <h1>插件开发</h1>
+      <p class="lead">建一个 GD-Plugin-xxx 仓库就能被插件广场搜到。</p>
+      <h2 id="插件就是一个仓库">插件就是一个仓库</h2>
+<p>仓库名以 <code>GD-Plugin-</code> 开头，插件广场会自动搜到。</p>
+<pre><code class="language-text">GD-Plugin-MyTool/
+  plugin.json
+  index.html
+</code></pre>
+<h2 id="pluginjson">plugin.json</h2>
+<pre><code class="language-json"><span class="p">{</span>
+<span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MyTool"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.0.0"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"一句话说明这个插件做什么"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"author"</span><span class="p">:</span><span class="w"> </span><span class="s2">"your-name"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"entry"</span><span class="p">:</span><span class="w"> </span><span class="s2">"index.html"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"icon"</span><span class="p">:</span><span class="w"> </span><span class="s2">"🧩"</span>
+<span class="p">}</span>
+</code></pre>
+<h2 id="页面里能用什么">页面里能用什么</h2>
+<p>插件在 iframe 里<strong>全屏</strong>运行，通过 <code>postMessage</code> 跟宿主通信。</p>
+<p>可参考 <a href="https://github.com/Cool-zimo/GD-Plugin-CoolClock">GD-Plugin-CoolClock</a>，
+照它的结构改就能做自己的。</p>
+<h2 id="桌面版才有能力">桌面版才有能力</h2>
+<p>网页版插件跑在浏览器沙箱里，<strong>碰不到本地文件系统</strong>。</p>
+<p>需要读写本地文件、执行系统命令的话，要用
+<a href="https://github.com/Cool-zimo/github-drive-desktop">桌面版</a>
+或 <a href="https://github.com/Cool-zimo/gdpy">gdpy</a>。两者都带权限模型兜底。</p>
+<h2 id="发布">发布</h2>
+<p>推到 GitHub，仓库名以 <code>GD-Plugin-</code> 开头即可。
+插件广场搜索有延迟，刚推的可能要等几分钟。</p>
+
+      <div class="pager"><a href="../user-guide/"><small>← 上一页</small><b>用户指南</b></a><a class="next" href="../faq/"><small>下一页 →</small><b>常见问题</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

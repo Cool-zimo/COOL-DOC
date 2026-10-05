@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Python from zero · COOL-DOC</title>
+<meta name="description" content="The single-book Chinese site — code runs in the page too.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../zh/python-tutorial/">中</a><a class="on" href="../../en/python-tutorial/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="" href="../../al/">AnyLearn</a><a class="" href="../../github_drive/">GitHub Drive</a><a class="" href="../../cangshu/">Cangshu</a><a class="" href="../../coverfit/">CoverFit</a><a class="on" href="../../python-tutorial/">Python from zero</a><a class="" href="../../tiny-md/">tiny-md</a><a class="" href="../../more/">Other tools</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../">COOL-DOC</a><span>/</span>Python from zero</div>
+    <article class="doc">
+      <h1>Python from zero</h1>
+      <p class="lead">The single-book Chinese site — code runs in the page too.</p>
+      <div class="cards"><a class="card" href="index/"><b>Overview</b><span>How it relates to AnyLearn, and who it is for.</span><span class="go">Read →</span></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

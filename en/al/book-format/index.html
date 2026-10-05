@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Book format spec · AnyLearn · COOL-DOC</title>
+<meta name="description" content="Field requirements for albook.json, toc.json, lessons and questions.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/al/book-format/">中</a><a class="on" href="../../../en/al/book-format/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="on" href="../../../al/">AnyLearn</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#albookjson" style="padding-left:10px;font-size:13px">albook.json</a><a href="#tocjson" style="padding-left:10px;font-size:13px">toc.json</a><a href="#lessons" style="padding-left:10px;font-size:13px">Lessons</a><a href="#questions" style="padding-left:10px;font-size:13px">Questions</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">AnyLearn</a><span>/</span>Book format spec</div>
+    <article class="doc">
+      <h1>Book format spec</h1>
+      <p class="lead">Field requirements for albook.json, toc.json, lessons and questions.</p>
+      <p>An AnyLearn textbook is a GitHub repository with a fixed layout:</p>
+<pre><code class="language-text">my-book/
+  albook.json
+  README.md
+  content/
+    zh/
+      toc.json
+      lessons/
+        01.md
+        02.md
+        test-01.md
+    en/
+      toc.json
+      lessons/
+        01.md
+</code></pre>
+<h2 id="albookjson">albook.json</h2>
+<p>Required fields:</p>
+<table>
+<thead>
+<tr>
+  <th>Field</th>
+  <th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>format</code></td>
+  <td>must be <strong>exactly</strong> <code>al-book</code></td>
+</tr>
+<tr>
+  <td><code>id</code></td>
+  <td>lowercase letters, digits, hyphens — e.g. <code>python-office</code></td>
+</tr>
+<tr>
+  <td><code>title</code></td>
+  <td>book title</td>
+</tr>
+<tr>
+  <td><code>subtitle</code></td>
+  <td>subtitle</td>
+</tr>
+<tr>
+  <td><code>desc</code></td>
+  <td>description</td>
+</tr>
+<tr>
+  <td><code>author</code></td>
+  <td>object, at least <code>name</code></td>
+</tr>
+<tr>
+  <td><code>license</code></td>
+  <td>e.g. <code>CC BY-NC 4.0</code></td>
+</tr>
+<tr>
+  <td><code>level</code></td>
+  <td>difficulty</td>
+</tr>
+<tr>
+  <td><code>langs</code></td>
+  <td>array, e.g. <code>[&quot;zh&quot;,&quot;en&quot;]</code></td>
+</tr>
+<tr>
+  <td><code>tags</code></td>
+  <td>array</td>
+</tr>
+</tbody>
+</table>
+<p>Optional:</p>
+<table>
+<thead>
+<tr>
+  <th>Field</th>
+  <th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>kind</code></td>
+  <td><code>textbook</code> (default) / <code>novel</code> / <code>notes</code> / <code>other</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>kind</code> decides <strong>whether question counts are enforced</strong>. Writing a novel or notes?
+Set <code>novel</code> or <code>notes</code> and you can publish with zero questions. But if you do include
+questions, they must be gradeable — validity is still checked.</p>
+<h2 id="tocjson">toc.json</h2>
+<pre><code class="language-json"><span class="p">{</span>
+<span class="w">  </span><span class="nt">"chapters"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Chapter 1 · Getting started"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"lessons"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"01"</span><span class="p">,</span><span class="w"> </span><span class="s2">"02"</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">"test"</span><span class="p">:</span><span class="w"> </span><span class="s2">"test-01"</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre>
+<p><code>lessons</code> holds filenames (without <code>.md</code>); <code>test</code> is the chapter-test filename.</p>
+<h2 id="lessons">Lessons</h2>
+<p>Each lesson is a Markdown file. Conventions:</p>
+<ul>
+<li>The first <code>#</code> is the lesson title</li>
+<li>Followed immediately by a <code>&gt;</code> lead paragraph</li>
+<li>Then the body</li>
+<li>Questions go at the end inside a ```quiz fence</li>
+</ul>
+<p><strong>The fence must be closed</strong> — the closing ``` needs its own line. Miss the blank
+line and the fence glues itself to the last paragraph, and the whole question fails to parse.</p>
+<h2 id="questions">Questions</h2>
+<p>A quiz block looks like this (fenced with four backticks so the inner
+triple-backtick block renders literally):</p>
+<pre><code class="language-text"><span class="err">```</span><span class="nx">quiz</span>
+<span class="k">type</span><span class="p">:</span><span class="w"> </span><span class="kd">choice</span>
+<span class="nx">q</span><span class="p">:</span><span class="w"> </span><span class="nx">Which</span><span class="w"> </span><span class="nx">of</span><span class="w"> </span><span class="nx">these</span><span class="w"> </span><span class="nx">creates</span><span class="w"> </span><span class="nx">an</span><span class="w"> </span><span class="nx">empty</span><span class="w"> </span><span class="nx">list</span><span class="p">?</span>
+<span class="nx">options</span><span class="p">:</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s">"[]"</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s">"list()"</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s">"Both of the above"</span>
+<span class="nx">answer</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span>
+<span class="nx">exam</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="nx">hint</span><span class="p">:</span><span class="w"> </span><span class="nx">Both</span><span class="w"> </span><span class="nx">forms</span><span class="w"> </span><span class="nx">work</span>
+<span class="nx">explain</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="nx">list</span><span class="p">()</span><span class="w"> </span><span class="nx">both</span><span class="w"> </span><span class="nx">create</span><span class="w"> </span><span class="nx">an</span><span class="w"> </span><span class="nx">empty</span><span class="w"> </span><span class="nx">list</span>
+<span class="err">```</span>
+</code></pre>
+<p><code>exam: true</code> means the question <strong>counts toward completion</strong>. A lesson usually has
+1 practice + 2 graded questions.</p>
+<p>Full question types and grading rules: <a href="../quiz-types/">Question types</a>.</p>
+
+      <div class="pager"><a href="../how-it-works/"><small>← Previous</small><b>How learning works</b></a><a class="next" href="../quiz-types/"><small>Next →</small><b>Question types &amp; grading</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FAQ · GitHub Drive · COOL-DOC</title>
+<meta name="description" content="File size limits, repo limits, CORS, multiple accounts.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/github_drive/faq/">中</a><a class="on" href="../../../en/github_drive/faq/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="" href="../../../al/">AnyLearn</a><a class="on" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#how-large-can-a-single-file-be" style="padding-left:10px;font-size:13px">How large can a single file be?</a><a href="#how-much-can-i-store" style="padding-left:10px;font-size:13px">How much can I store?</a><a href="#why-would-i-need-the-local-backend" style="padding-left:10px;font-size:13px">Why would I need the local backend?</a><a href="#multiple-accounts" style="padding-left:10px;font-size:13px">Multiple accounts?</a><a href="#where-is-plugin-data-stored" style="padding-left:10px;font-size:13px">Where is plugin data stored?</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">GitHub Drive</a><span>/</span>FAQ</div>
+    <article class="doc">
+      <h1>FAQ</h1>
+      <p class="lead">File size limits, repo limits, CORS, multiple accounts.</p>
+      <h2 id="how-large-can-a-single-file-be">How large can a single file be?</h2>
+<p>GitHub caps a single file at <strong>100MB</strong>. Larger files are chunked automatically across
+several repositories and reassembled on read. The process is transparent.</p>
+<h2 id="how-much-can-i-store">How much can I store?</h2>
+<p>It depends on your GitHub account quota. Free accounts have no hard total limit, but
+keeping a single repository under 1GB is advisable — Git operations slow down noticeably
+beyond that.</p>
+<h2 id="why-would-i-need-the-local-backend">Why would I need the local backend?</h2>
+<p>Talking to the GitHub API directly from the browser hits CORS restrictions, and some
+networks (corporate ones especially) will fail. In that case run the
+<a href="https://github.com/Cool-zimo/github-drive-server">local server</a>, which provides a
+CORS proxy, Bilibili video resolution, and command execution.</p>
+<h2 id="multiple-accounts">Multiple accounts?</h2>
+<p>Yes. The sidebar can switch between several GitHub accounts, each with its own
+independently stored token.</p>
+<h2 id="where-is-plugin-data-stored">Where is plugin data stored?</h2>
+<p>Plugin HTML lives in browser localStorage and does not sync across devices — where a
+plugin keeps its own data is up to the plugin.</p>
+
+      <div class="pager"><a href="../plugin-development/"><small>← Previous</small><b>Plugin development</b></a><a style="visibility:hidden"></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

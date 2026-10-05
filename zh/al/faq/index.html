@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>常见问题 · AnyLearn · 通学万义 · COOL-DOC</title>
+<meta name="description" content="登录、额度、搜索、搜不到书这些高频问题。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/al/faq/">中</a><a class="" href="../../../en/al/faq/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="on" href="../../../al/">AnyLearn · 通学万义</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#一定要登录吗" style="padding-left:10px;font-size:13px">一定要登录吗？</a><a href="#token-安全吗" style="padding-left:10px;font-size:13px">Token 安全吗？</a><a href="#为什么刷新后要卡一下登录页" style="padding-left:10px;font-size:13px">为什么刷新后要卡一下登录页？</a><a href="#搜索能搜什么" style="padding-left:10px;font-size:13px">搜索能搜什么？</a><a href="#我的第三方书发布了却搜不到" style="padding-left:10px;font-size:13px">我的第三方书发布了却搜不到？</a><a href="#一本书能有多少课" style="padding-left:10px;font-size:13px">一本书能有多少课？</a><a href="#能写小说吗" style="padding-left:10px;font-size:13px">能写小说吗？</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">AnyLearn · 通学万义</a><span>/</span>常见问题</div>
+    <article class="doc">
+      <h1>常见问题</h1>
+      <p class="lead">登录、额度、搜索、搜不到书这些高频问题。</p>
+      <h2 id="一定要登录吗">一定要登录吗？</h2>
+<p>看官方教材不用。但<strong>第三方教材要靠你的 token 去 GitHub 搜索</strong>。</p>
+<p>未认证 API 是 60 次/小时，搜一次书 + 取几个仓库的 <code>albook.json</code> 就快见底了。
+登录后 5000 次/小时，而且能走 API 实时版（0.57s），不用等 CDN 缓存。</p>
+<h2 id="token-安全吗">Token 安全吗？</h2>
+<p>只写进浏览器 localStorage，从不外发。本站是纯静态页面，没有后端可以接收它。</p>
+<p>建议用 <strong>Fine-grained token</strong>，只勾 <code>Contents: Read and write</code>，有效期 90 天。</p>
+<h2 id="为什么刷新后要卡一下登录页">为什么刷新后要卡一下登录页？</h2>
+<p>旧版本是&quot;先联网验证通过才准进&quot;，每次刷新都等 GitHub 往返。</p>
+<p>现在改成：<strong>有本地 token 就立刻进</strong>，用户名头像先用缓存的，验证放后台悄悄做。
+真失效了才弹回登录；网络不通只挂个提示条，不踢人。</p>
+<h2 id="搜索能搜什么">搜索能搜什么？</h2>
+<p><strong>书名和目录</strong>（章标题、课标题）。不搜正文。</p>
+<p>这是刻意的选择：索引从 1.7MB 瘦到 176KB，打开就有结果，不用后台偷偷拉全文。
+代价是只在正文里出现过的冷门词搜不到。</p>
+<h2 id="我的第三方书发布了却搜不到">我的第三方书发布了却搜不到？</h2>
+<p>看 <a href="../publish/">评审与发布</a> 里那一节。最常见的是<strong>校验没过</strong> ——
+评审报告有错误的话机器人不收录。</p>
+<h2 id="一本书能有多少课">一本书能有多少课？</h2>
+<p>没有硬限制。目录是按章组织的，一章可以有任意多课。</p>
+<h2 id="能写小说吗">能写小说吗？</h2>
+<p>能。<code>albook.json</code> 里设 <code>&quot;kind&quot;: &quot;novel&quot;</code>，就不要求题目数量了。</p>
+<p>但有题就得是能判分的题 —— 合法性照样查。</p>
+
+      <div class="pager"><a href="../publish/"><small>← 上一页</small><b>评审与发布</b></a><a style="visibility:hidden"></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

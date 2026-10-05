@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Overview · Other tools · COOL-DOC</title>
+<meta name="description" content="One line and a link for each small tool.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/more/index/">中</a><a class="on" href="../../../en/more/index/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="" href="../../../al/">AnyLearn</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="on" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#github-drive-ecosystem" style="padding-left:10px;font-size:13px">GitHub Drive ecosystem</a><a href="#libraries" style="padding-left:10px;font-size:13px">Libraries</a><a href="#just-for-fun" style="padding-left:10px;font-size:13px">Just for fun</a><a href="#anylearn" style="padding-left:10px;font-size:13px">AnyLearn</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">Other tools</a><span>/</span>Overview</div>
+    <article class="doc">
+      <h1>Overview</h1>
+      <p class="lead">One line and a link for each small tool.</p>
+      <h2 id="github-drive-ecosystem">GitHub Drive ecosystem</h2>
+<table>
+<thead>
+<tr>
+  <th>Repo</th>
+  <th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><a href="https://github.com/Cool-zimo/github-drive-desktop">Desktop (Electron)</a></td>
+  <td>Lets plugins read/write local files and run commands, behind a permission model</td>
+</tr>
+<tr>
+  <td><a href="https://github.com/Cool-zimo/gdpy">gdpy</a></td>
+  <td>Python + Tkinter desktop client, built by Actions, no Python install needed</td>
+</tr>
+<tr>
+  <td><a href="https://github.com/Cool-zimo/github-drive-server">Local server</a></td>
+  <td>Go-based local capability platform: CORS proxy, Bilibili parsing, command execution</td>
+</tr>
+<tr>
+  <td><a href="https://github.com/Cool-zimo/github_drive_plugins">Plugin market</a></td>
+  <td>Create a <code>GD-Plugin-xxx</code> repo and it gets found</td>
+</tr>
+<tr>
+  <td><a href="https://github.com/Cool-zimo/GD-Plugin-CoolClock">CoolClock plugin</a></td>
+  <td>Reference implementation for third-party plugins</td>
+</tr>
+</tbody>
+</table>
+<h2 id="libraries">Libraries</h2>
+<table>
+<thead>
+<tr>
+  <th>Repo</th>
+  <th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><a href="https://github.com/Cool-zimo/tiny-md">tiny-md</a></td>
+  <td>Zero-dependency Markdown + LaTeX renderer</td>
+</tr>
+<tr>
+  <td><a href="https://github.com/Cool-zimo/fengjson">fengjson</a></td>
+  <td>Python json stdlib wrapper with tests and logging</td>
+</tr>
+</tbody>
+</table>
+<h2 id="just-for-fun">Just for fun</h2>
+<table>
+<thead>
+<tr>
+  <th>Repo</th>
+  <th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><a href="https://github.com/Cool-zimo/xiudao">xiudao</a></td>
+  <td>A browser-based text cultivation game</td>
+</tr>
+<tr>
+  <td><a href="https://github.com/Cool-zimo/cat-sigma">Cat Sigma</a></td>
+  <td>Cat Sigma GIF showcase</td>
+</tr>
+</tbody>
+</table>
+<h2 id="anylearn">AnyLearn</h2>
+<table>
+<thead>
+<tr>
+  <th>Repo</th>
+  <th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><a href="https://github.com/Cool-zimo/al">al</a></td>
+  <td>The AnyLearn site</td>
+</tr>
+<tr>
+  <td><a href="https://github.com/Cool-zimo/al-textbooks">al-textbooks</a></td>
+  <td>Textbook content repository</td>
+</tr>
+<tr>
+  <td><a href="https://github.com/Cool-zimo/al-docs">al-docs</a></td>
+  <td>Third-party book index and format spec</td>
+</tr>
+</tbody>
+</table>
+
+      
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

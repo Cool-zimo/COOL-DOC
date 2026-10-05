@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Review &amp; publish · AnyLearn · COOL-DOC</title>
+<meta name="description" content="How to read the review report, what publishing does, and why a book might not show up.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/al/publish/">中</a><a class="on" href="../../../en/al/publish/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="on" href="../../../al/">AnyLearn</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#the-review-report" style="padding-left:10px;font-size:13px">The review report</a><a href="#title-dedupe" style="padding-left:10px;font-size:13px">Title dedupe</a><a href="#what-publish-does" style="padding-left:10px;font-size:13px">What &quot;publish&quot; does</a><a href="#cant-find-your-book-after-publishing" style="padding-left:10px;font-size:13px">Can&#x27;t find your book after publishing?</a><a href="#visibility" style="padding-left:10px;font-size:13px">Visibility</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">AnyLearn</a><span>/</span>Review &amp; publish</div>
+    <article class="doc">
+      <h1>Review &amp; publish</h1>
+      <p class="lead">How to read the review report, what publishing does, and why a book might not show up.</p>
+      <h2 id="the-review-report">The review report</h2>
+<p>Management panel → &quot;Review report&quot; runs a full validation and lists every error and warning.</p>
+<p><strong>Errors block publishing; warnings don't.</strong> Warnings are still worth a glance —
+&quot;lesson is only 51 lines, may be placeholder&quot; usually means it genuinely isn't finished.</p>
+<p>What gets checked:</p>
+<ul>
+<li>Required <code>albook.json</code> fields, and whether <code>id</code> is legal</li>
+<li>Whether files declared in <code>toc.json</code> actually exist</li>
+<li>Question counts per lesson (a textbook wants 1 practice + 2 graded)</li>
+<li>Validity of every question: out-of-range choice indices, <code>cases</code> format, closed fences</li>
+<li>Whether the zh and en question counts match</li>
+</ul>
+<h2 id="title-dedupe">Title dedupe</h2>
+<p>Publishing checks for duplicate titles against <strong>both official and third-party</strong> books.
+Before comparing, spaces are stripped, case folded, and full-width chars normalised:</p>
+<table>
+<thead>
+<tr>
+  <th>Input</th>
+  <th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>Python Office Automation</code></td>
+  <td>blocked (same title)</td>
+</tr>
+<tr>
+  <td><code>pythonofficeautomation</code></td>
+  <td>blocked (same after stripping spaces)</td>
+</tr>
+<tr>
+  <td><code>ＰＹＴＨＯＮ...</code></td>
+  <td>blocked (same after normalising full-width)</td>
+</tr>
+</tbody>
+</table>
+<p>Stripping spaces is essential — otherwise adding a space would defeat the whole check.</p>
+<h2 id="what-publish-does">What &quot;publish&quot; does</h2>
+<ol>
+<li>Validate content</li>
+<li>Create the repository (public or private)</li>
+<li>Push every file with <code>commitTree</code> — <strong>one single commit</strong></li>
+<li>Add the <code>topic: al-book</code> label</li>
+</ol>
+<div class="tip tip-bad">
+<b>Why commitTree is mandatory</b>
+<p>An early version pushed files concurrently via the contents API. Result: GitHub had
+already created a README at repo creation, so re-pushing lacked a sha and returned 422;
+concurrent follow-up requests used a stale base and returned 409.
+<b>The errors were swallowed by a catch, so the user saw "published successfully"</b> —
+while only 10 of 15 files actually landed.</p>
+<p>With commitTree the commit is atomic: zero missing files in the same scenario. It
+also re-reads the file tree afterwards to verify.</p>
+</div>
+
+<p><strong>Only public repositories get indexed.</strong> Private ones you can see yourself; nobody
+else can find them.</p>
+<h2 id="cant-find-your-book-after-publishing">Can't find your book after publishing?</h2>
+<p>Check in order:</p>
+<ol>
+<li><strong>Validation failed</strong> — if the review report has errors, the bot won't index it</li>
+<li><strong>GitHub search index lag</strong> — new repos and new topics take a few minutes to appear
+under <code>topic:al-book</code> (your own books show immediately because the repo name is
+remembered at publish time and doesn't go through search)</li>
+<li><strong>The repo is private</strong></li>
+</ol>
+<p>The management panel has a &quot;publish health check&quot; that tells you exactly which files
+are missing and whether the topic is set.</p>
+<h2 id="visibility">Visibility</h2>
+<p>You can flip public ↔ private any time from the management panel. Switching to private
+also removes the <code>al-book</code> topic, so it won't get picked up if you later make it public
+by accident.</p>
+
+      <div class="pager"><a href="../write-book/"><small>← Previous</small><b>Write a book</b></a><a class="next" href="../faq/"><small>Next →</small><b>FAQ</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

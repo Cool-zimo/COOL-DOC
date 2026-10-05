@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>评审与发布 · AnyLearn · 通学万义 · COOL-DOC</title>
+<meta name="description" content="评审报告怎么读、一键发布做了什么、发布后为什么搜不到。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/al/publish/">中</a><a class="" href="../../../en/al/publish/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="on" href="../../../al/">AnyLearn · 通学万义</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#评审报告" style="padding-left:10px;font-size:13px">评审报告</a><a href="#书名查重" style="padding-left:10px;font-size:13px">书名查重</a><a href="#一键发布做了什么" style="padding-left:10px;font-size:13px">一键发布做了什么</a><a href="#发布后搜不到" style="padding-left:10px;font-size:13px">发布后搜不到？</a><a href="#可见性" style="padding-left:10px;font-size:13px">可见性</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">AnyLearn · 通学万义</a><span>/</span>评审与发布</div>
+    <article class="doc">
+      <h1>评审与发布</h1>
+      <p class="lead">评审报告怎么读、一键发布做了什么、发布后为什么搜不到。</p>
+      <h2 id="评审报告">评审报告</h2>
+<p>管理面板 → 「评审报告」，会跑一遍完整校验，列出所有错误和警告。</p>
+<p><strong>错误会拦住发布，警告不会。</strong> 但警告通常值得看一眼 —— 比如&quot;课文只有 51 行，
+可能是占位内容&quot;，那多半就是真的没写完。</p>
+<p>评审检查的东西：</p>
+<ul>
+<li><code>albook.json</code> 的必填字段、<code>id</code> 是否合法</li>
+<li><code>toc.json</code> 里声明的文件是否真的存在</li>
+<li>每课的题目数量（教材要求 1 随堂 + 2 测验）</li>
+<li>每道题的合法性：选择题下标越界、函数题 cases 格式、围栏是否闭合</li>
+<li>中英题数是否一致</li>
+</ul>
+<h2 id="书名查重">书名查重</h2>
+<p>发布前会查重，<strong>官方和第三方都算</strong>。比对前去空格、转小写、全角转半角：</p>
+<table>
+<thead>
+<tr>
+  <th>输入</th>
+  <th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>Python 自动化办公</code></td>
+  <td>拦下（撞同名）</td>
+</tr>
+<tr>
+  <td><code>python自动化办公</code></td>
+  <td>拦下（去空格后同名）</td>
+</tr>
+<tr>
+  <td><code>ＰＹＴＨＯＮ自动化办公</code></td>
+  <td>拦下（全角转半角后同名）</td>
+</tr>
+</tbody>
+</table>
+<p>中文连写必须拦 —— 否则加个空格就能绕过，查重形同虚设。</p>
+<h2 id="一键发布做了什么">一键发布做了什么</h2>
+<ol>
+<li>校验内容</li>
+<li>创建仓库（公开或私有）</li>
+<li>用 <code>commitTree</code> <strong>一次提交</strong>所有文件</li>
+<li>打上 <code>topic: al-book</code></li>
+</ol>
+<div class="tip tip-bad">
+<b>为什么必须用 commitTree</b>
+<p>早期版本用 contents API 并发推文件，结果：建仓时 GitHub 已生成 README，
+再推就缺 sha 报 422；并发的后续请求基于过期 base 报 409。
+<b>而错误被 catch 吞掉了，用户看到的是"发布成功"</b> —— 实际上 15 个文件只推上去 10 个。</p>
+<p>改用 commitTree 后是原子提交，同一个场景缺失 0 个。推完还会拉回文件树核对。</p>
+</div>
+
+<p><strong>只有公开的仓库会被收录。</strong> 私有的你自己能看到，别人搜不到。</p>
+<h2 id="发布后搜不到">发布后搜不到？</h2>
+<p>按顺序排查：</p>
+<ol>
+<li><strong>校验没过</strong> —— 评审报告有错误的话，机器人不收录</li>
+<li><strong>GitHub 搜索索引延迟</strong> —— 新仓库、新 topic 要几分钟才进 <code>topic:al-book</code>
+（自己的书会立刻显示，因为发布时记了仓库名，不走搜索）</li>
+<li><strong>仓库是私有的</strong></li>
+</ol>
+<p>管理面板有「发布体检」，直接查已发布仓库缺什么文件、topic 在不在。</p>
+<h2 id="可见性">可见性</h2>
+<p>管理面板可以随时改公开 ↔ 私有。改私有会给它摘掉 <code>al-book</code> topic，
+避免以后误公开又被扫到。</p>
+
+      <div class="pager"><a href="../write-book/"><small>← 上一页</small><b>怎么写一本书</b></a><a class="next" href="../faq/"><small>下一页 →</small><b>常见问题</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

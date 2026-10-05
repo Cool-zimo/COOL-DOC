@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>COOL-DOC · Docs for every Cool-zimo project</title>
+<meta name="description" content="Docs for every Cool-zimo project">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../zh/">中</a><a class="on" href="../en/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="" href="../al/">AnyLearn</a><a class="" href="../github_drive/">GitHub Drive</a><a class="" href="../cangshu/">Cangshu</a><a class="" href="../coverfit/">CoverFit</a><a class="" href="../python-tutorial/">Python from zero</a><a class="" href="../tiny-md/">tiny-md</a><a class="" href="../more/">Other tools</a></nav>
+  <main class="main">
+    <article class="doc">
+      <h1>COOL-DOC</h1>
+      <p class="lead">Docs for every Cool-zimo project · Bilingual</p>
+      <div class="cards"><a class="card" href="al/"><b>AnyLearn</b><span>Programming tutorials where code actually runs in your browser — with notes and spaced repetition.</span><span class="go">Read →</span></a><a class="card" href="github_drive/"><b>GitHub Drive</b><span>Use GitHub repositories as a drive: store files, chunked upload, one-click sharing, plugins.</span><span class="go">Read →</span></a><a class="card" href="cangshu/"><b>Cangshu</b><span>A GitHub repository management panel: card view, in-browser editing, Pages status at a glance.</span><span class="go">Read →</span></a><a class="card" href="coverfit/"><b>CoverFit</b><span>Image cropping and format conversion, entirely in your browser — nothing is uploaded.</span><span class="go">Read →</span></a><a class="card" href="python-tutorial/"><b>Python from zero</b><span>The single-book Chinese site — code runs in the page too.</span><span class="go">Read →</span></a><a class="card" href="tiny-md/"><b>tiny-md</b><span>A zero-dependency Markdown + LaTeX renderer — formulas render without typing $.</span><span class="go">Read →</span></a><a class="card" href="more/"><b>Other tools</b><span>gdpy, local server, plugin market, xiudao, fengjson, Cat Sigma.</span><span class="go">Read →</span></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

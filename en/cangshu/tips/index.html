@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tips · Cangshu · COOL-DOC</title>
+<meta name="description" content="A few time-saving tricks.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/cangshu/tips/">中</a><a class="on" href="../../../en/cangshu/tips/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="" href="../../../al/">AnyLearn</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="on" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#filter-by-pages-status" style="padding-left:10px;font-size:13px">Filter by Pages status</a><a href="#find-what-you-just-pushed" style="padding-left:10px;font-size:13px">Find what you just pushed</a><a href="#pairing-with-drive" style="padding-left:10px;font-size:13px">Pairing with Drive</a><a href="#archive-instead-of-deleting" style="padding-left:10px;font-size:13px">Archive instead of deleting</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">Cangshu</a><span>/</span>Tips</div>
+    <article class="doc">
+      <h1>Tips</h1>
+      <p class="lead">A few time-saving tricks.</p>
+      <h2 id="filter-by-pages-status">Filter by Pages status</h2>
+<p>To find which repos have broken Pages or none at all, filter directly.</p>
+<h2 id="find-what-you-just-pushed">Find what you just pushed</h2>
+<p>The commit hash on each card is the latest. After a push, glance here — faster than
+scrolling through GitHub's list.</p>
+<h2 id="pairing-with-drive">Pairing with Drive</h2>
+<ul>
+<li>Drive stores files → Cangshu manages repositories</li>
+<li>Both sidebars have a one-click jump to the other</li>
+</ul>
+<h2 id="archive-instead-of-deleting">Archive instead of deleting</h2>
+<p><strong>Archiving</strong> is safer than deleting: read-only, full history kept, marked as archived
+in the UI so you can't act on it by accident.</p>
+
+      <div class="pager"><a href="../getting-started/"><small>← Previous</small><b>Getting started</b></a><a style="visibility:hidden"></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

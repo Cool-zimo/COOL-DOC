@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How learning works · AnyLearn · COOL-DOC</title>
+<meta name="description" content="Why code runs, how progress is counted, how review is scheduled, and what the guardian does.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/al/how-it-works/">中</a><a class="on" href="../../../en/al/how-it-works/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="on" href="../../../al/">AnyLearn</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#the-code-really-runs" style="padding-left:10px;font-size:13px">The code really runs</a><a href="#how-progress-is-counted" style="padding-left:10px;font-size:13px">How progress is counted</a><a href="#ebbinghaus-review" style="padding-left:10px;font-size:13px">Ebbinghaus review</a><a href="#the-guardian" style="padding-left:10px;font-size:13px">The guardian</a><a href="#note-syncing" style="padding-left:10px;font-size:13px">Note syncing</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">AnyLearn</a><span>/</span>How learning works</div>
+    <article class="doc">
+      <h1>How learning works</h1>
+      <p class="lead">Why code runs, how progress is counted, how review is scheduled, and what the guardian does.</p>
+      <h2 id="the-code-really-runs">The code really runs</h2>
+<p>Python blocks are executed by <strong>Pyodide</strong> — CPython compiled to WebAssembly,
+running inside your browser.</p>
+<p>That means:</p>
+<ul>
+<li>The full standard library is there, <code>import</code> actually works</li>
+<li>Errors are real Python errors, not made up</li>
+<li>It works offline (once Pyodide has been loaded)</li>
+</ul>
+<p>The cost is roughly a 10MB runtime download on first load. The browser caches it after that.</p>
+<h2 id="how-progress-is-counted">How progress is counted</h2>
+<p>A lesson is complete when you <strong>finish the questions marked &quot;counts&quot;</strong>.
+In-lesson practice doesn't count.</p>
+<p>The rule comes from the <code>exam: true</code> flag on each question. The author decides which
+ones count, so how strict &quot;complete&quot; is depends on the book.</p>
+<h2 id="ebbinghaus-review">Ebbinghaus review</h2>
+<p>Finished lessons enter a review queue with these intervals:</p>
+<table>
+<thead>
+<tr>
+  <th>Review #</th>
+  <th>Interval</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>1</td>
+  <td>1 day</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td>2 days</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td>4 days</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td>7 days</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td>15 days</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td>30 days</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td>60 days</td>
+</tr>
+<tr>
+  <td>after</td>
+  <td>graduated</td>
+</tr>
+</tbody>
+</table>
+<p>A correct answer advances you one step, a wrong one sends you back. This is <strong>not</strong>
+a plain &quot;done and forgotten&quot;.</p>
+<h2 id="the-guardian">The guardian</h2>
+<p>Studying too long in one sitting triggers a break reminder.</p>
+<p>The reasoning is blunt: the most common failure mode for a programming tutorial isn't
+failing to understand it, it's <strong>studying too long once and never opening it again</strong>.
+The reminder exists so you'll still want to come back tomorrow.</p>
+<p>Turn it off in settings if you like.</p>
+<h2 id="note-syncing">Note syncing</h2>
+<p>Notes live in your own private repository <code>python-tutorial-notes</code>:</p>
+<pre><code class="language-text">notes/
+  {bookId}/
+    {lessonId}.md
+</code></pre>
+<p>They're committed with the Git Data API <code>commitTree</code> — one commit, all-or-nothing,
+so you never end up with a half-written state. Auto-syncs a few seconds after you stop typing.</p>
+
+      <div class="pager"><a href="../getting-started/"><small>← Previous</small><b>Getting started</b></a><a class="next" href="../book-format/"><small>Next →</small><b>Book format spec</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

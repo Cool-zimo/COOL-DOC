@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>怎么写一本书 · AnyLearn · 通学万义 · COOL-DOC</title>
+<meta name="description" content="三条路径：从文章导入、开发者平台手写、从已有书导入。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/al/write-book/">中</a><a class="" href="../../../en/al/write-book/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="on" href="../../../al/">AnyLearn · 通学万义</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#路径一从一篇-markdown-导入最快" style="padding-left:10px;font-size:13px">路径一：从一篇 Markdown 导入（最快）</a><a href="#路径二开发者平台手写" style="padding-left:10px;font-size:13px">路径二：开发者平台手写</a><a href="#题目库" style="padding-left:24px;font-size:12.5px">题目库</a><a href="#草稿存哪" style="padding-left:24px;font-size:12.5px">草稿存哪</a><a href="#路径三从已有书导入" style="padding-left:10px;font-size:13px">路径三：从已有书导入</a><a href="#三条路径之后" style="padding-left:10px;font-size:13px">三条路径之后</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">AnyLearn · 通学万义</a><span>/</span>怎么写一本书</div>
+    <article class="doc">
+      <h1>怎么写一本书</h1>
+      <p class="lead">三条路径：从文章导入、开发者平台手写、从已有书导入。</p>
+      <h2 id="路径一从一篇-markdown-导入最快">路径一：从一篇 Markdown 导入（最快）</h2>
+<p>你已经有笔记、博客、讲稿？直接变成一本书。</p>
+<p>开发者平台 → <strong>「从文章导入」</strong> → 粘贴 Markdown 或直接把 <code>.md</code> 拖进去。</p>
+<p>拆分规则：</p>
+<table>
+<thead>
+<tr>
+  <th>文章结构</th>
+  <th>拆成</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>有 h1 也有 h2</td>
+  <td>h1 是章，h2 是课</td>
+</tr>
+<tr>
+  <td>只有 h1</td>
+  <td>每个 h1 一课</td>
+</tr>
+<tr>
+  <td>一个标题都没有</td>
+  <td>按 700 字切</td>
+</tr>
+</tbody>
+</table>
+<p>导入后 <code>kind</code> 自动设成 <code>notes</code>（不要求题目），因为文章本来就没题。
+想做成真教材，在「书籍信息」里改成 <code>textbook</code> 再加题。</p>
+<div class="tip tip-note">
+<b>代码块里的 # 不会被当成标题</b>
+<p>Python 注释写 <code># 错误写法</code> 很常见。如果扫标题时不跳过代码块，
+一篇带注释的文章会被切成几十个"课"。</p>
+</div>
+
+<h2 id="路径二开发者平台手写">路径二：开发者平台手写</h2>
+<p>开发者平台是三栏编辑器：左边章节树，中间写 Markdown，右边实时预览。</p>
+<ul>
+<li>自由加章、给章加课，标题点着改</li>
+<li>输入停 400ms 自动出预览</li>
+<li><strong>预览里的题目是真能做的</strong> —— 选择题能选，函数题真调函数</li>
+</ul>
+<p>预览题带 <code>__dev__:</code> 前缀隔离，<strong>不写进学习进度、不触发复习排期</strong>。
+否则你试着做一道自己的草稿题，会被当成真实学习行为，污染进度。</p>
+<h3 id="题目库">题目库</h3>
+<p>顶栏「⊞ 题目库」有 11 个现成片段，点一下插到光标位置。
+顶部开关决定插进来的是随堂还是计入学完的测验。</p>
+<p>也可以把自己的题存成自定义片段 —— 选中一个 quiz 块点「存成自定义片段」，
+存在你的私有草稿仓库 <code>al-drafts</code>，换设备能拉回来。</p>
+<h3 id="草稿存哪">草稿存哪</h3>
+<p>第一次进开发者平台会自动创建 <code>你的用户名/al-drafts</code> <strong>私有仓库</strong>。
+停止改动 3 秒后自动存云端，换设备点「从云端拉取」。</p>
+<pre><code class="language-text">drafts/{id}/meta.json
+drafts/{id}/lessons/01.md
+drafts/{id}/lessons/test-01.md
+</code></pre>
+<h2 id="路径三从已有书导入">路径三：从已有书导入</h2>
+<p>开发者平台 → 「从已有书导入」 → 贴 <code>owner/repo</code> 或从列表里选。</p>
+<p>会生成一本新草稿，随便改。原作者信息保留 —— 按许可证署名。</p>
+<h2 id="三条路径之后">三条路径之后</h2>
+<p>都要走同一套：<a href="../publish/">评审与发布</a>。</p>
+
+      <div class="pager"><a href="../quiz-types/"><small>← 上一页</small><b>题型与判分</b></a><a class="next" href="../publish/"><small>下一页 →</small><b>评审与发布</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

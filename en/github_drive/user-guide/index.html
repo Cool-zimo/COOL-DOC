@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>User guide · GitHub Drive · COOL-DOC</title>
+<meta name="description" content="Views, multi-select, favourites, sharing, plugins, housekeeping.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/github_drive/user-guide/">中</a><a class="on" href="../../../en/github_drive/user-guide/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="" href="../../../al/">AnyLearn</a><a class="on" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#file-management" style="padding-left:10px;font-size:13px">File management</a><a href="#switching-views" style="padding-left:24px;font-size:12.5px">Switching views</a><a href="#multi-select" style="padding-left:24px;font-size:12.5px">Multi-select</a><a href="#drag-to-move" style="padding-left:24px;font-size:12.5px">Drag to move</a><a href="#path-navigation" style="padding-left:24px;font-size:12.5px">Path navigation</a><a href="#favourites--recent" style="padding-left:10px;font-size:13px">Favourites &amp; recent</a><a href="#sharing" style="padding-left:10px;font-size:13px">Sharing</a><a href="#creating-a-share" style="padding-left:24px;font-size:12.5px">Creating a share</a><a href="#my-shares" style="padding-left:24px;font-size:12.5px">My shares</a><a href="#discovering-shares" style="padding-left:24px;font-size:12.5px">Discovering shares</a><a href="#plugins" style="padding-left:10px;font-size:13px">Plugins</a><a href="#install--run" style="padding-left:24px;font-size:12.5px">Install &amp; run</a><a href="#manage" style="padding-left:24px;font-size:12.5px">Manage</a><a href="#settings--housekeeping" style="padding-left:10px;font-size:13px">Settings &amp; housekeeping</a><a href="#clean-repository-history" style="padding-left:24px;font-size:12.5px">Clean repository history</a><a href="#sign-out" style="padding-left:24px;font-size:12.5px">Sign out</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">GitHub Drive</a><span>/</span>User guide</div>
+    <article class="doc">
+      <h1>User guide</h1>
+      <p class="lead">Views, multi-select, favourites, sharing, plugins, housekeeping.</p>
+      <h2 id="file-management">File management</h2>
+<h3 id="switching-views">Switching views</h3>
+<p>The ▦/☰ buttons toggle grid and list view; the preference is saved.</p>
+<h3 id="multi-select">Multi-select</h3>
+<ul>
+<li>Hold Ctrl/Cmd and click files to toggle selection</li>
+<li>With several selected, right-click any of them for bulk: delete, move, copy,
+favourite, download, share</li>
+</ul>
+<h3 id="drag-to-move">Drag to move</h3>
+<ul>
+<li>Onto a folder in the current directory → moves into it</li>
+<li>Onto any level of the top breadcrumb → moves to that directory</li>
+<li>Onto &quot;Drive Home&quot; → moves to the root</li>
+</ul>
+<h3 id="path-navigation">Path navigation</h3>
+<p>The breadcrumb shows the current path; click any level to jump. It scrolls
+horizontally when too long.</p>
+<h2 id="favourites--recent">Favourites &amp; recent</h2>
+<ul>
+<li>Right-click → favourite / unfavourite</li>
+<li>Sidebar &quot;Favourites&quot; lists everything starred (folders included)</li>
+<li>Sidebar &quot;Recent&quot; lists recently opened files</li>
+</ul>
+<h2 id="sharing">Sharing</h2>
+<h3 id="creating-a-share">Creating a share</h3>
+<ol>
+<li>Right-click a file (multi-select works) → Share</li>
+<li>Fill in name and description</li>
+<li>A public repo named <code>gd-share-{name}-{timestamp}</code> is created</li>
+<li>GitHub Pages is enabled and a share link produced</li>
+</ol>
+<p>A <strong>progress window</strong> shows five steps:
+create repo → copy files → upload → enable Pages → done. Each step is
+pending / in progress / complete.</p>
+<h3 id="my-shares">My shares</h3>
+<p>Sidebar &quot;My shares&quot; lists everything you've created.</p>
+<div class="tip tip-note">
+<b>The list is read straight from GitHub</b>
+<p>It scans your account for <code>gd-share-*</code> repositories rather than reading
+browser-local records — so it still works after switching devices or clearing cache.
+Each entry carries a "cloud" badge, shows its real size, and can delete the repo in one click.</p>
+</div>
+
+<h3 id="discovering-shares">Discovering shares</h3>
+<ul>
+<li>Sidebar &quot;Discover shares&quot;</li>
+<li>Searches every public repository starting with <code>gd-share-</code></li>
+<li>Validates the standard share format (share.json)</li>
+<li>Cards show author, description and file count, with a one-click jump</li>
+</ul>
+<h2 id="plugins">Plugins</h2>
+<h3 id="install--run">Install &amp; run</h3>
+<ol>
+<li>Sidebar → Plugin market</li>
+<li>Click &quot;Install&quot;</li>
+<li>Click &quot;Run&quot; — opens full screen</li>
+</ol>
+<p>The top bar shows the plugin name and version; press ESC or &quot;✕&quot; to exit.
+Multiple plugins can run at once.</p>
+<h3 id="manage">Manage</h3>
+<p>Installed ones show an &quot;Installed&quot; tag; click &quot;Uninstall&quot; to remove.
+Plugin HTML is stored in browser localStorage.</p>
+<h2 id="settings--housekeeping">Settings &amp; housekeeping</h2>
+<h3 id="clean-repository-history">Clean repository history</h3>
+<p>Repeatedly editing large files bloats a Git repository. A GitHub Action compresses
+history automatically every Sunday. You can also trigger it manually:
+repo → Actions → &quot;Clean repository history&quot; → Run workflow.</p>
+<h3 id="sign-out">Sign out</h3>
+<p>Sidebar bottom → &quot;Sign out&quot;, which clears the local token and all data.</p>
+
+      <div class="pager"><a href="../getting-started/"><small>← Previous</small><b>Getting started</b></a><a class="next" href="../plugin-development/"><small>Next →</small><b>Plugin development</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

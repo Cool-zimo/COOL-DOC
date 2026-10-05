@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Question types &amp; grading · AnyLearn · COOL-DOC</title>
+<meta name="description" content="All nine question types, how each is graded, and the easiest ways to get them wrong.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/al/quiz-types/">中</a><a class="on" href="../../../en/al/quiz-types/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="on" href="../../../al/">AnyLearn</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#multiple-choice" style="padding-left:10px;font-size:13px">Multiple choice</a><a href="#fill-in-the-blank" style="padding-left:10px;font-size:13px">Fill in the blank</a><a href="#function-questions" style="padding-left:10px;font-size:13px">Function questions</a><a href="#random-result-questions" style="padding-left:10px;font-size:13px">Random-result questions</a><a href="#program-questions" style="padding-left:10px;font-size:13px">Program questions</a><a href="#web-questions-html--css--js" style="padding-left:10px;font-size:13px">Web questions (html / css / js)</a><a href="#local--project-questions" style="padding-left:10px;font-size:13px">Local / project questions</a><a href="#common-fields" style="padding-left:10px;font-size:13px">Common fields</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">AnyLearn</a><span>/</span>Question types &amp; grading</div>
+    <article class="doc">
+      <h1>Question types &amp; grading</h1>
+      <p class="lead">All nine question types, how each is graded, and the easiest ways to get them wrong.</p>
+      <h2 id="multiple-choice">Multiple choice</h2>
+<pre><code class="language-text"><span class="k">type</span><span class="p">:</span><span class="w"> </span><span class="kd">choice</span>
+<span class="nx">q</span><span class="p">:</span><span class="w"> </span><span class="nx">Question</span><span class="w"> </span><span class="nx">text</span>
+<span class="nx">options</span><span class="p">:</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s">"A"</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s">"B"</span>
+<span class="nx">answer</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+</code></pre>
+<p><code>answer</code> is a <strong>zero-based index</strong>. For multiple answers add <code>multi: true</code> and use
+comma-separated indices: <code>0, 2</code>.</p>
+<blockquote>
+<p>The classic mistake: writing <code>answer: 1</code> meaning &quot;the first one&quot;. That's actually
+the second option.</p>
+</blockquote>
+<h2 id="fill-in-the-blank">Fill in the blank</h2>
+<pre><code class="language-text"><span class="k">type</span><span class="p">:</span><span class="w"> </span><span class="nx">fill</span>
+<span class="nx">q</span><span class="p">:</span><span class="w"> </span><span class="nx">In</span><span class="w"> </span><span class="nx">Python</span><span class="w"> </span><span class="nx">you</span><span class="w"> </span><span class="nx">create</span><span class="w"> </span><span class="nx">an</span><span class="w"> </span><span class="nx">empty</span><span class="w"> </span><span class="nx">dict</span><span class="w"> </span><span class="nx">with</span><span class="w"> </span><span class="nx">__</span>
+<span class="nx">answer</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
+</code></pre>
+<p>Use <code>|</code> for several acceptable answers: <code>answer: dict()|{}</code>.</p>
+<h2 id="function-questions">Function questions</h2>
+<p>Your function is actually called and the return value compared.</p>
+<pre><code class="language-text"><span class="k">type</span><span class="p">:</span><span class="w"> </span><span class="nx">func</span>
+<span class="nx">q</span><span class="p">:</span><span class="w"> </span><span class="nx">Write</span><span class="w"> </span><span class="nx">add</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">b</span><span class="p">)</span><span class="w"> </span><span class="nx">returning</span><span class="w"> </span><span class="nx">the</span><span class="w"> </span><span class="nx">sum</span>
+<span class="nx">code</span><span class="p">:</span><span class="w"> </span><span class="o">|</span>
+<span class="w">  </span><span class="nx">def</span><span class="w"> </span><span class="nx">add</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">b</span><span class="p">):</span>
+<span class="w">      </span><span class="nx">pass</span>
+<span class="nx">cases</span><span class="p">:</span><span class="w"> </span><span class="o">|</span>
+<span class="w">  </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">3</span>
+<span class="w">  </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">12</span>
+</code></pre>
+<div class="tip tip-bad">
+<b>The easiest trap</b>
+<p>Arguments in <code>cases</code> <b>must be comma-separated</b>. Writing
+<code>1 2 -> 3</code> is read as a single argument, the call becomes
+<code>add("1 2")</code>, and you get "missing argument b".</p>
+</div>
+
+<p>&quot;Just split on spaces too&quot; isn't an option — it would break single-argument cases
+like <code>&quot;hello world&quot; -&gt; 5</code>.</p>
+<h2 id="random-result-questions">Random-result questions</h2>
+<p>When the result is inherently random (dice, card draws), grading can only check a range:</p>
+<pre><code class="language-text"><span class="nb">type</span><span class="p">:</span> <span class="n">rand</span>
+<span class="n">q</span><span class="p">:</span> <span class="n">Roll</span> <span class="n">a</span> <span class="n">six</span><span class="o">-</span><span class="n">sided</span> <span class="n">die</span>
+<span class="n">code</span><span class="p">:</span> <span class="o">|</span>
+  <span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">roll</span><span class="p">():</span>
+      <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="n">cases</span><span class="p">:</span> <span class="o">|</span>
+  <span class="o">*</span><span class="mi">30</span> <span class="o">-&gt;</span> <span class="mf">1..6</span>
+</code></pre>
+<p><code>*30</code> runs it 30 times, <code>1..6</code> is a closed interval.</p>
+<blockquote>
+<p><code>random.randrange(1, 6)</code> is <strong>half-open</strong> and will never return 6. Use <code>randrange(1, 7)</code>.</p>
+</blockquote>
+<h2 id="program-questions">Program questions</h2>
+<p>Runs the whole program and asserts on the output:</p>
+<pre><code class="language-text"><span class="k">type</span><span class="p">:</span><span class="w"> </span><span class="nx">code</span>
+<span class="nx">q</span><span class="p">:</span><span class="w"> </span><span class="nx">Print</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="mi">5</span>
+<span class="nx">code</span><span class="p">:</span><span class="w"> </span><span class="o">|</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">):</span>
+<span class="w">      </span><span class="nx">print</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span>
+<span class="nx">checks</span><span class="p">:</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">__out</span><span class="w"> </span><span class="nx">contains</span><span class="w"> </span><span class="s">"1"</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">__out</span><span class="w"> </span><span class="nx">contains</span><span class="w"> </span><span class="s">"5"</span>
+</code></pre>
+<h2 id="web-questions-html--css--js">Web questions (html / css / js)</h2>
+<p>Rendered in a sandboxed iframe, asserted via <code>checks</code>.</p>
+<div class="tip tip-warn">
+<b>These assertions can never pass — don't write them</b>
+<p>· <code>getComputedStyle(el).height === 'auto'</code> — resolves to a pixel value</p>
+<p>· expecting <code>:hover</code> to apply — JS cannot trigger pseudo-classes</p>
+<p>· expecting a <code>&lt;button&gt;</code>'s default font-size to be 14px — it's 13.333px</p>
+</div>
+
+<h2 id="local--project-questions">Local / project questions</h2>
+<p>Can't be auto-graded, so they carry a self-check list:</p>
+<pre><code class="language-text"><span class="n">type</span><span class="p">:</span><span class="w"> </span><span class="n">local</span>
+<span class="n">q</span><span class="p">:</span><span class="w"> </span><span class="n">Run</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">Flask</span><span class="w"> </span><span class="n">server</span><span class="w"> </span><span class="n">locally</span>
+<span class="n">checklist</span><span class="p">:</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="n">It</span><span class="w"> </span><span class="n">starts</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="n">The</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="n">loads</span>
+</code></pre>
+<h2 id="common-fields">Common fields</h2>
+<table>
+<thead>
+<tr>
+  <th>Field</th>
+  <th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>hint</code></td>
+  <td>Shown on demand</td>
+</tr>
+<tr>
+  <td><code>explain</code></td>
+  <td>Shown after answering, explains why</td>
+</tr>
+<tr>
+  <td><code>exam</code></td>
+  <td><code>true</code> means it counts toward completion</td>
+</tr>
+</tbody>
+</table>
+
+      <div class="pager"><a href="../book-format/"><small>← Previous</small><b>Book format spec</b></a><a class="next" href="../write-book/"><small>Next →</small><b>Write a book</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

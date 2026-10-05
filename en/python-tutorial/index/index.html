@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Overview · Python from zero · COOL-DOC</title>
+<meta name="description" content="How it relates to AnyLearn, and who it is for.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/python-tutorial/index/">中</a><a class="on" href="../../../en/python-tutorial/index/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="" href="../../../al/">AnyLearn</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="on" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#how-it-differs-from-anylearn" style="padding-left:10px;font-size:13px">How it differs from AnyLearn</a><a href="#shared" style="padding-left:10px;font-size:13px">Shared</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">Python from zero</a><span>/</span>Overview</div>
+    <article class="doc">
+      <h1>Overview</h1>
+      <p class="lead">How it relates to AnyLearn, and who it is for.</p>
+      <p>Open <a href="https://cool-zimo.github.io/python-tutorial/">Python from zero</a>.</p>
+<p>This is AnyLearn's <strong>single-book Chinese site</strong> — the content focuses on one Python
+beginner track rather than AnyLearn's 25 textbooks.</p>
+<h2 id="how-it-differs-from-anylearn">How it differs from AnyLearn</h2>
+<table>
+<thead>
+<tr>
+  <th></th>
+  <th>This site</th>
+  <th>AnyLearn</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Books</td>
+  <td>1</td>
+  <td>25</td>
+</tr>
+<tr>
+  <td>Languages</td>
+  <td>Chinese</td>
+  <td>zh + en</td>
+</tr>
+<tr>
+  <td>Third-party books</td>
+  <td>no</td>
+  <td>yes</td>
+</tr>
+<tr>
+  <td>Review scheduling</td>
+  <td>yes</td>
+  <td>yes</td>
+</tr>
+</tbody>
+</table>
+<p>If you only want Python basics, this site is lighter. For more tracks (algorithms, web,
+data analysis, stdlib) or to author your own book, use AnyLearn.</p>
+<h2 id="shared">Shared</h2>
+<ul>
+<li>Code really runs in the browser (Pyodide)</li>
+<li>Notes sync to your private repository</li>
+<li>Ebbinghaus review scheduling</li>
+</ul>
+
+      
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

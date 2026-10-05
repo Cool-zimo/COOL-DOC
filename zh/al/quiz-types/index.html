@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>题型与判分 · AnyLearn · 通学万义 · COOL-DOC</title>
+<meta name="description" content="九种题型怎么出、怎么判分、以及最容易踩的坑。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/al/quiz-types/">中</a><a class="" href="../../../en/al/quiz-types/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="on" href="../../../al/">AnyLearn · 通学万义</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#选择题" style="padding-left:10px;font-size:13px">选择题</a><a href="#填空题" style="padding-left:10px;font-size:13px">填空题</a><a href="#函数题" style="padding-left:10px;font-size:13px">函数题</a><a href="#随机结果题" style="padding-left:10px;font-size:13px">随机结果题</a><a href="#程序题" style="padding-left:10px;font-size:13px">程序题</a><a href="#网页三题型html--css--js" style="padding-left:10px;font-size:13px">网页三题型（html / css / js）</a><a href="#本地运行题local--project" style="padding-left:10px;font-size:13px">本地运行题（local / project）</a><a href="#通用字段" style="padding-left:10px;font-size:13px">通用字段</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">AnyLearn · 通学万义</a><span>/</span>题型与判分</div>
+    <article class="doc">
+      <h1>题型与判分</h1>
+      <p class="lead">九种题型怎么出、怎么判分、以及最容易踩的坑。</p>
+      <h2 id="选择题">选择题</h2>
+<pre><code class="language-text"><span class="k">type</span><span class="p">:</span><span class="w"> </span><span class="kd">choice</span>
+<span class="nx">q</span><span class="p">:</span><span class="w"> </span><span class="nx">题干</span>
+<span class="nx">options</span><span class="p">:</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s">"A"</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s">"B"</span>
+<span class="nx">answer</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+</code></pre>
+<p><code>answer</code> 是<strong>下标，从 0 开始</strong>。多选题加 <code>multi: true</code>，answer 用逗号分隔：<code>0, 2</code>。</p>
+<blockquote>
+<p>最常见的错：<code>answer</code> 写成 1 表示&quot;第 1 个&quot;。那其实是第二个选项。</p>
+</blockquote>
+<h2 id="填空题">填空题</h2>
+<pre><code class="language-text"><span class="k">type</span><span class="p">:</span><span class="w"> </span><span class="nx">fill</span>
+<span class="nx">q</span><span class="p">:</span><span class="w"> </span><span class="nx">Python</span><span class="w"> </span><span class="nx">里创建空字典用</span><span class="w"> </span><span class="nx">__</span><span class="err">？</span>
+<span class="nx">answer</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
+</code></pre>
+<p><code>|</code> 可以给多个可接受答案：<code>answer: dict()|{}</code>。</p>
+<h2 id="函数题">函数题</h2>
+<p>真调用你的函数、比对返回值。</p>
+<pre><code class="language-text"><span class="k">type</span><span class="p">:</span><span class="w"> </span><span class="nx">func</span>
+<span class="nx">q</span><span class="p">:</span><span class="w"> </span><span class="nx">写一个</span><span class="w"> </span><span class="nx">add</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">b</span><span class="p">)</span><span class="w"> </span><span class="nx">返回两数之和</span>
+<span class="nx">code</span><span class="p">:</span><span class="w"> </span><span class="o">|</span>
+<span class="w">  </span><span class="nx">def</span><span class="w"> </span><span class="nx">add</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">b</span><span class="p">):</span>
+<span class="w">      </span><span class="nx">pass</span>
+<span class="nx">cases</span><span class="p">:</span><span class="w"> </span><span class="o">|</span>
+<span class="w">  </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">3</span>
+<span class="w">  </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">12</span>
+</code></pre>
+<div class="tip tip-bad">
+<b>最容易踩的坑</b>
+<p><code>cases</code> 的参数<b>必须用逗号分隔</b>。写 <code>1 2 -> 3</code> 会被当成"一个参数"，
+调用变成 <code>add("1 2")</code>，报"缺少参数 b"。</p>
+</div>
+
+<p>不能改成&quot;空格也切&quot;——那会破坏 <code>&quot;hello world&quot; -&gt; 5</code> 这种单参数字符串用例。</p>
+<h2 id="随机结果题">随机结果题</h2>
+<p>结果本身是随机的（掷骰子、抽卡），判分只能验范围：</p>
+<pre><code class="language-text"><span class="nb">type</span><span class="p">:</span> <span class="n">rand</span>
+<span class="n">q</span><span class="p">:</span> <span class="n">掷一个六面骰子</span>
+<span class="n">code</span><span class="p">:</span> <span class="o">|</span>
+  <span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">roll</span><span class="p">():</span>
+      <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="n">cases</span><span class="p">:</span> <span class="o">|</span>
+  <span class="o">*</span><span class="mi">30</span> <span class="o">-&gt;</span> <span class="mf">1..6</span>
+</code></pre>
+<p><code>*30</code> 跑 30 次，<code>1..6</code> 是闭区间。</p>
+<blockquote>
+<p><code>random.randrange(1, 6)</code> 是<strong>开区间</strong>，永远返回不到 6。要 <code>randrange(1, 7)</code>。</p>
+</blockquote>
+<h2 id="程序题">程序题</h2>
+<p>跑整段程序，对输出做断言：</p>
+<pre><code class="language-text"><span class="k">type</span><span class="p">:</span><span class="w"> </span><span class="nx">code</span>
+<span class="nx">q</span><span class="p">:</span><span class="w"> </span><span class="nx">打印</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="nx">到</span><span class="w"> </span><span class="mi">5</span>
+<span class="nx">code</span><span class="p">:</span><span class="w"> </span><span class="o">|</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">):</span>
+<span class="w">      </span><span class="nx">print</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span>
+<span class="nx">checks</span><span class="p">:</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">__out</span><span class="w"> </span><span class="nx">contains</span><span class="w"> </span><span class="s">"1"</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">__out</span><span class="w"> </span><span class="nx">contains</span><span class="w"> </span><span class="s">"5"</span>
+</code></pre>
+<h2 id="网页三题型html--css--js">网页三题型（html / css / js）</h2>
+<p>在沙箱 iframe 里渲染，用 <code>checks</code> 断言。</p>
+<div class="tip tip-warn">
+<b>这几个断言永远不成立，别写</b>
+<p>· <code>getComputedStyle(el).height === 'auto'</code> —— 算出来是像素值</p>
+<p>· 期待 <code>:hover</code> 生效 —— JS 触发不了伪类</p>
+<p>· 期待 <code>&lt;button&gt;</code> 默认字号是 14px —— 实际是 13.333px</p>
+</div>
+
+<h2 id="本地运行题local--project">本地运行题（local / project）</h2>
+<p>没法自动判分，给一个清单自评：</p>
+<pre><code class="language-text"><span class="k">type</span><span class="p">:</span><span class="w"> </span><span class="nx">local</span>
+<span class="nx">q</span><span class="p">:</span><span class="w"> </span><span class="nx">在本机跑通一个</span><span class="w"> </span><span class="nx">Flask</span><span class="w"> </span><span class="nx">服务</span>
+<span class="nx">checklist</span><span class="p">:</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">能启动</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">能访问首页</span>
+</code></pre>
+<h2 id="通用字段">通用字段</h2>
+<table>
+<thead>
+<tr>
+  <th>字段</th>
+  <th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>hint</code></td>
+  <td>提示，点一下才展开</td>
+</tr>
+<tr>
+  <td><code>explain</code></td>
+  <td>做完显示，讲为什么</td>
+</tr>
+<tr>
+  <td><code>exam</code></td>
+  <td><code>true</code> 表示计入学完</td>
+</tr>
+</tbody>
+</table>
+
+      <div class="pager"><a href="../book-format/"><small>← 上一页</small><b>教材格式规范</b></a><a class="next" href="../write-book/"><small>下一页 →</small><b>怎么写一本书</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>快速开始 · AnyLearn · 通学万义 · COOL-DOC</title>
+<meta name="description" content="登录、挑一本书、学完第一课。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/al/getting-started/">中</a><a class="" href="../../../en/al/getting-started/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="on" href="../../../al/">AnyLearn · 通学万义</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#1-登录" style="padding-left:10px;font-size:13px">1. 登录</a><a href="#2-挑一本书" style="padding-left:10px;font-size:13px">2. 挑一本书</a><a href="#3-学一课" style="padding-left:10px;font-size:13px">3. 学一课</a><a href="#4-笔记" style="padding-left:10px;font-size:13px">4. 笔记</a><a href="#5-复习" style="padding-left:10px;font-size:13px">5. 复习</a><a href="#6-接下来" style="padding-left:10px;font-size:13px">6. 接下来</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">AnyLearn · 通学万义</a><span>/</span>快速开始</div>
+    <article class="doc">
+      <h1>快速开始</h1>
+      <p class="lead">登录、挑一本书、学完第一课。</p>
+      <h2 id="1-登录">1. 登录</h2>
+<p>打开 <a href="https://cool-zimo.github.io/al/zh/">AnyLearn</a>，粘贴一个 GitHub Personal Access Token。</p>
+<ul>
+<li>打开 GitHub → Settings → Developer settings → <strong>Personal access tokens</strong></li>
+<li>建议用 <strong>Fine-grained token</strong>，只勾 <code>Contents: Read and write</code>，有效期 90 天</li>
+<li>粘贴回来，点「验证并进入」</li>
+</ul>
+<blockquote>
+<p>Token 只存在浏览器 localStorage，从不发往本站以外的任何服务器。
+本站是纯静态页面，没有后端可以接收它。</p>
+</blockquote>
+<p>为什么要登录：不登录也能看官方教材，但<strong>第三方教材要靠你的 token 去 GitHub 搜索</strong>。
+未认证 API 只有 60 次/小时，搜几本书就见底；登录后是 5000 次/小时。</p>
+<h2 id="2-挑一本书">2. 挑一本书</h2>
+<p>首页是全部教材的卡片列表。点封面进入。</p>
+<ul>
+<li>卡片上的标签是难度分级：入门 / 进阶 / 实战 / 复习</li>
+<li>第三方教材会带一个「第三方」角标</li>
+<li>顶部搜索框可以在所有教材的<strong>书名和目录</strong>里找关键词</li>
+</ul>
+<h2 id="3-学一课">3. 学一课</h2>
+<p>每课的结构是：标题 → 一段引言 → 正文 → 随堂练习 → 测验。</p>
+<p><strong>代码是真的在跑。</strong> 正文里的 Python 代码块可以直接编辑、点「运行」，
+由浏览器内的 Pyodide 执行 —— 不是截图，不是模拟器，是真的 CPython 编译的 wasm。</p>
+<ul>
+<li><strong>随堂练习</strong>：不计入进度，用来确认你读懂了</li>
+<li><strong>测验（标「计入学完」）</strong>：做完才算这一课学完</li>
+</ul>
+<h2 id="4-笔记">4. 笔记</h2>
+<p>右侧栏可以随时记笔记，跟着课文走。</p>
+<p>笔记会同步到你自己的<strong>私有仓库</strong> <code>python-tutorial-notes</code>，
+换设备登录同一个账号就能拉回来。没登录就只存在本地。</p>
+<h2 id="5-复习">5. 复习</h2>
+<p>学完的课会进入艾宾浩斯复习队列：</p>
+<pre><code class="language-text"><span class="mf">1</span><span class="w"> </span><span class="n">天</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="mf">2</span><span class="w"> </span><span class="n">天</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="mf">4</span><span class="w"> </span><span class="n">天</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="mf">7</span><span class="w"> </span><span class="n">天</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="mf">15</span><span class="w"> </span><span class="n">天</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="mf">30</span><span class="w"> </span><span class="n">天</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="mf">60</span><span class="w"> </span><span class="n">天</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">毕业</span>
+</code></pre>
+<p>到期的课会出现在侧边栏「今日复习」。这不是提醒你&quot;该学了&quot;，
+而是<strong>在遗忘曲线的拐点上把你拉回来</strong>。</p>
+<h2 id="6-接下来">6. 接下来</h2>
+<ul>
+<li>想给别人写教材 → <a href="../write-book/">怎么写一本书</a></li>
+<li>想查格式细节 → <a href="../book-format/">教材格式规范</a></li>
+<li>有问题 → <a href="../faq/">常见问题</a></li>
+</ul>
+
+      <div class="pager"><a style="visibility:hidden"></a><a class="next" href="../how-it-works/"><small>下一页 →</small><b>学习机制</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

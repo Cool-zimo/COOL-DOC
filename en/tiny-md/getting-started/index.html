@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How to use · tiny-md · COOL-DOC</title>
+<meta name="description" content="Two ways: JS API and plain HTML inline.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/tiny-md/getting-started/">中</a><a class="on" href="../../../en/tiny-md/getting-started/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="" href="../../../al/">AnyLearn</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="on" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#with-js" style="padding-left:10px;font-size:13px">With JS</a><a href="#without-writing-js" style="padding-left:10px;font-size:13px">Without writing JS</a><a href="#demo" style="padding-left:10px;font-size:13px">Demo</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">tiny-md</a><span>/</span>How to use</div>
+    <article class="doc">
+      <h1>How to use</h1>
+      <p class="lead">Two ways: JS API and plain HTML inline.</p>
+      <h2 id="with-js">With JS</h2>
+<pre><code class="language-js"><span class="kd">const</span><span class="w"> </span><span class="nx">TinyMD</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">'tiny-md'</span><span class="p">);</span>
+<span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">'out'</span><span class="p">).</span><span class="nx">innerHTML</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">TinyMD</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
+</code></pre>
+<p>Highlight only:</p>
+<pre><code class="language-js"><span class="nx">TinyMD</span><span class="p">.</span><span class="nx">highlight</span><span class="p">(</span><span class="s1">'const x = 1;'</span><span class="p">,</span><span class="w"> </span><span class="s1">'js'</span><span class="p">);</span>
+</code></pre>
+<h2 id="without-writing-js">Without writing JS</h2>
+<pre><code class="language-html"><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">"https://cdn.jsdelivr.net/gh/Cool-zimo/tiny-md/tiny-md.js"</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">"text/tiny-md"</span><span class="p">&gt;</span>
+<span class="err">#</span><span class="w"> </span><span class="nx">Just</span><span class="w"> </span><span class="nx">write</span><span class="w"> </span><span class="nx">Markdown</span>
+<span class="nx">Formulas</span><span class="w"> </span><span class="nx">like</span><span class="w"> </span><span class="nx">$x</span><span class="o">^</span><span class="mf">2</span><span class="nx">$</span><span class="w"> </span><span class="nx">render</span><span class="w"> </span><span class="nx">too</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</code></pre>
+<h2 id="demo">Demo</h2>
+<p><a href="https://cool-zimo.github.io/tiny-md/demo.html">Live demo</a></p>
+
+      <div class="pager"><a style="visibility:hidden"></a><a class="next" href="../design/"><small>Next →</small><b>Design choices</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

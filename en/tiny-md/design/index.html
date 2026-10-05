@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Design choices · tiny-md · COOL-DOC</title>
+<meta name="description" content="Escape first, then build tags — and why $ is not required.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/tiny-md/design/">中</a><a class="on" href="../../../en/tiny-md/design/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="" href="../../../al/">AnyLearn</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="on" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#escape-first-then-build" style="padding-left:10px;font-size:13px">Escape first, then build</a><a href="#no--required" style="padding-left:10px;font-size:13px">No $ required</a><a href="#zero-dependencies" style="padding-left:10px;font-size:13px">Zero dependencies</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">tiny-md</a><span>/</span>Design choices</div>
+    <article class="doc">
+      <h1>Design choices</h1>
+      <p class="lead">Escape first, then build tags — and why $ is not required.</p>
+      <h2 id="escape-first-then-build">Escape first, then build</h2>
+<p>The order is <strong>escape user input first, then generate HTML tags</strong> — not the reverse.</p>
+<p>Do it the other way and content like <code>&lt;script&gt;</code> becomes a tag before it gets
+&quot;escaped&quot;, which is too late — that's how XSS happens.</p>
+<h2 id="no--required">No $ required</h2>
+<p>Many renderers require formulas to be wrapped in <code>$...$</code>. tiny-md recognises patterns
+like <code>x^2</code> and <code>a_i</code> on its own, with no extra markup.</p>
+<p>The cost is <strong>occasional false positives</strong> — writing <code>a_b</code> in prose may be read as a
+subscript. Wrap it in backticks when that matters.</p>
+<h2 id="zero-dependencies">Zero dependencies</h2>
+<p>No libraries, a single JS file. The trade-off is fewer features than marked or
+markdown-it, but it drops into any page directly.</p>
+
+      <div class="pager"><a href="../getting-started/"><small>← Previous</small><b>How to use</b></a><a style="visibility:hidden"></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

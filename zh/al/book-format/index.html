@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>教材格式规范 · AnyLearn · 通学万义 · COOL-DOC</title>
+<meta name="description" content="albook.json、toc.json、课文与题目的字段要求。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/al/book-format/">中</a><a class="" href="../../../en/al/book-format/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="on" href="../../../al/">AnyLearn · 通学万义</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#albookjson" style="padding-left:10px;font-size:13px">albook.json</a><a href="#tocjson" style="padding-left:10px;font-size:13px">toc.json</a><a href="#课文" style="padding-left:10px;font-size:13px">课文</a><a href="#题目" style="padding-left:10px;font-size:13px">题目</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">AnyLearn · 通学万义</a><span>/</span>教材格式规范</div>
+    <article class="doc">
+      <h1>教材格式规范</h1>
+      <p class="lead">albook.json、toc.json、课文与题目的字段要求。</p>
+      <p>一个 AnyLearn 教材就是一个 GitHub 仓库，目录结构固定：</p>
+<pre><code class="language-text">my-book/
+  albook.json
+  README.md
+  content/
+    zh/
+      toc.json
+      lessons/
+        01.md
+        02.md
+        test-01.md
+    en/
+      toc.json
+      lessons/
+        01.md
+</code></pre>
+<h2 id="albookjson">albook.json</h2>
+<p>必要字段：</p>
+<table>
+<thead>
+<tr>
+  <th>字段</th>
+  <th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>format</code></td>
+  <td>必须<strong>精确</strong>等于 <code>al-book</code></td>
+</tr>
+<tr>
+  <td><code>id</code></td>
+  <td>小写字母、数字、连字符，如 <code>python-office</code></td>
+</tr>
+<tr>
+  <td><code>title</code></td>
+  <td>书名</td>
+</tr>
+<tr>
+  <td><code>subtitle</code></td>
+  <td>副标题</td>
+</tr>
+<tr>
+  <td><code>desc</code></td>
+  <td>简介</td>
+</tr>
+<tr>
+  <td><code>author</code></td>
+  <td>对象，至少含 <code>name</code></td>
+</tr>
+<tr>
+  <td><code>license</code></td>
+  <td>如 <code>CC BY-NC 4.0</code></td>
+</tr>
+<tr>
+  <td><code>level</code></td>
+  <td>难度</td>
+</tr>
+<tr>
+  <td><code>langs</code></td>
+  <td>数组，如 <code>[&quot;zh&quot;,&quot;en&quot;]</code></td>
+</tr>
+<tr>
+  <td><code>tags</code></td>
+  <td>数组</td>
+</tr>
+</tbody>
+</table>
+<p>可选字段：</p>
+<table>
+<thead>
+<tr>
+  <th>字段</th>
+  <th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>kind</code></td>
+  <td><code>textbook</code>（默认）/ <code>novel</code> / <code>notes</code> / <code>other</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>kind</code> 决定<strong>是否强制要求题目数量</strong>。写小说、写笔记就设成 <code>novel</code> 或 <code>notes</code>，
+一道题没有也能发布。但有题就得是能判分的题 —— 合法性照样查。</p>
+<h2 id="tocjson">toc.json</h2>
+<pre><code class="language-json"><span class="p">{</span>
+<span class="w">  </span><span class="nt">"chapters"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"第 1 章 · 开始"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"lessons"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"01"</span><span class="p">,</span><span class="w"> </span><span class="s2">"02"</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">"test"</span><span class="p">:</span><span class="w"> </span><span class="s2">"test-01"</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre>
+<p><code>lessons</code> 是文件名（不含 <code>.md</code>），<code>test</code> 是章测文件名。</p>
+<h2 id="课文">课文</h2>
+<p>每篇课文是一个 Markdown 文件。约定：</p>
+<ul>
+<li>第一个 <code>#</code> 是课标题</li>
+<li>紧接着一段 <code>&gt;</code> 引言</li>
+<li>然后是正文</li>
+<li>题目用 ```quiz 围栏写在文末</li>
+</ul>
+<p><strong>题目围栏必须闭合</strong> —— 结尾那个 ``` 要独占一行。少一个空行，
+围栏就粘在正文后面，整道题读不出来。</p>
+<h2 id="题目">题目</h2>
+<p>一个 quiz 块长这样（外层用四个反引号，这样里面的三反引号才能正常显示）：</p>
+<pre><code class="language-text"><span class="err">```</span><span class="nx">quiz</span>
+<span class="k">type</span><span class="p">:</span><span class="w"> </span><span class="kd">choice</span>
+<span class="nx">q</span><span class="p">:</span><span class="w"> </span><span class="nx">下面哪个能创建空列表</span><span class="err">？</span>
+<span class="nx">options</span><span class="p">:</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s">"[]"</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s">"list()"</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="s">"以上都对"</span>
+<span class="nx">answer</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span>
+<span class="nx">exam</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="nx">hint</span><span class="p">:</span><span class="w"> </span><span class="nx">两种写法都对</span>
+<span class="nx">explain</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w"> </span><span class="nx">和</span><span class="w"> </span><span class="nx">list</span><span class="p">()</span><span class="w"> </span><span class="nx">都创建空列表</span>
+<span class="err">```</span>
+</code></pre>
+<p><code>exam: true</code> 表示这道题<strong>计入学完</strong>。一课通常 1 道随堂 + 2 道测验。</p>
+<p>题型的完整清单和判分机制见 <a href="../quiz-types/">题型与判分</a>。</p>
+
+      <div class="pager"><a href="../how-it-works/"><small>← 上一页</small><b>学习机制</b></a><a class="next" href="../quiz-types/"><small>下一页 →</small><b>题型与判分</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

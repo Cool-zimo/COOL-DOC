@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>快速开始 · 仓鼠 Cangshu · COOL-DOC</title>
+<meta name="description" content="登录、看卡片、在线改文件。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/cangshu/getting-started/">中</a><a class="" href="../../../en/cangshu/getting-started/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="" href="../../../al/">AnyLearn · 通学万义</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="on" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#卡片上有什么" style="padding-left:10px;font-size:13px">卡片上有什么</a><a href="#在线改文件" style="padding-left:10px;font-size:13px">在线改文件</a><a href="#批量操作" style="padding-left:10px;font-size:13px">批量操作</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">仓鼠 Cangshu</a><span>/</span>快速开始</div>
+    <article class="doc">
+      <h1>快速开始</h1>
+      <p class="lead">登录、看卡片、在线改文件。</p>
+      <p>打开 <a href="https://cool-zimo.github.io/cangshu/">仓鼠</a>，用 GitHub Token 登录。</p>
+<p><strong>和 GitHub Drive 同源</strong> —— 两个应用都在 <code>cool-zimo.github.io</code> 下，
+token 在浏览器本地共享，登录一次两边都进。</p>
+<h2 id="卡片上有什么">卡片上有什么</h2>
+<p>每张卡片直接显示：</p>
+<ul>
+<li>仓库名、描述、语言</li>
+<li><strong>Pages 状态</strong>（是否已部署）</li>
+<li><strong>最新 commit hash</strong></li>
+<li>星标、可见性</li>
+</ul>
+<p>不用点进去、不用切到 GitHub 就能知道这个仓库是不是活的。</p>
+<h2 id="在线改文件">在线改文件</h2>
+<p>右键文件 → 丢进 <strong>vscode.dev</strong> 编辑。
+改完在 vscode.dev 里提交，回来刷新就能看到。</p>
+<h2 id="批量操作">批量操作</h2>
+<p>多选卡片可以批量：设公开/私有、加 topic、删除。</p>
+<blockquote>
+<p>删除仓库是不可逆的。批量删之前建议先设私有观察几天。</p>
+</blockquote>
+
+      <div class="pager"><a style="visibility:hidden"></a><a class="next" href="../tips/"><small>下一页 →</small><b>使用技巧</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

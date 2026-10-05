@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Getting started · Cangshu · COOL-DOC</title>
+<meta name="description" content="Sign in, browse cards, edit files online.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/cangshu/getting-started/">中</a><a class="on" href="../../../en/cangshu/getting-started/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="" href="../../../al/">AnyLearn</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="on" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#whats-on-a-card" style="padding-left:10px;font-size:13px">What&#x27;s on a card</a><a href="#editing-files-online" style="padding-left:10px;font-size:13px">Editing files online</a><a href="#bulk-operations" style="padding-left:10px;font-size:13px">Bulk operations</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">Cangshu</a><span>/</span>Getting started</div>
+    <article class="doc">
+      <h1>Getting started</h1>
+      <p class="lead">Sign in, browse cards, edit files online.</p>
+      <p>Open <a href="https://cool-zimo.github.io/cangshu/">Cangshu</a> and sign in with a GitHub token.</p>
+<p><strong>Same origin as GitHub Drive</strong> — both apps are served from <code>cool-zimo.github.io</code>, so
+the token is shared in browser localStorage and signing into one signs you into both.</p>
+<h2 id="whats-on-a-card">What's on a card</h2>
+<p>Each card shows directly:</p>
+<ul>
+<li>Repo name, description, language</li>
+<li><strong>Pages status</strong> (deployed or not)</li>
+<li><strong>Latest commit hash</strong></li>
+<li>Stars, visibility</li>
+</ul>
+<p>You can tell whether a repo is alive without opening it or switching to GitHub.</p>
+<h2 id="editing-files-online">Editing files online</h2>
+<p>Right-click a file → open it in <strong>vscode.dev</strong>. Commit there, come back and refresh.</p>
+<h2 id="bulk-operations">Bulk operations</h2>
+<p>Multi-select cards to bulk: set public/private, add topics, delete.</p>
+<blockquote>
+<p>Deleting a repository is irreversible. Consider setting things private for a few days
+before bulk-deleting.</p>
+</blockquote>
+
+      <div class="pager"><a style="visibility:hidden"></a><a class="next" href="../tips/"><small>Next →</small><b>Tips</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

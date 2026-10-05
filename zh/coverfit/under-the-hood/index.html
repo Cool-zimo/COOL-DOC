@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>实现细节 · CoverFit · COOL-DOC</title>
+<meta name="description" content="为什么 BMP 和 ICO 是自己写的编码器。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/coverfit/under-the-hood/">中</a><a class="" href="../../../en/coverfit/under-the-hood/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="" href="../../../al/">AnyLearn · 通学万义</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="on" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#自己写编码器" style="padding-left:10px;font-size:13px">自己写编码器</a><a href="#格式可用性靠探测" style="padding-left:10px;font-size:13px">格式可用性靠探测</a><a href="#导出结果验证过" style="padding-left:10px;font-size:13px">导出结果验证过</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">CoverFit</a><span>/</span>实现细节</div>
+    <article class="doc">
+      <h1>实现细节</h1>
+      <p class="lead">为什么 BMP 和 ICO 是自己写的编码器。</p>
+      <h2 id="自己写编码器">自己写编码器</h2>
+<p><strong>BMP</strong> 只有部分浏览器支持 <code>toBlob</code>，<strong>ICO 所有浏览器都不支持</strong>。</p>
+<p>所以这两个格式的编码器是自己写的。不这么做的话，选 BMP 或 ICO 会静默失败 ——
+按钮点了没反应，或者下载下来其实是个 PNG 却叫 <code>.ico</code>。</p>
+<h2 id="格式可用性靠探测">格式可用性靠探测</h2>
+<p>不查 User-Agent，而是拿 1×1 画布实际编一次，看返回的 <code>blob.type</code>。</p>
+<div class="tip tip-warn">
+<b>为什么不能只看有没有返回值</b>
+<p><code>toBlob</code> 不支持某格式时会<b>静默退化成 PNG</b>，
+返回值照样有。只有检查 <code>blob.type</code> 才能发现。</p>
+<p>当前浏览器不支持的格式会直接禁用并说明原因。</p>
+</div>
+
+<h2 id="导出结果验证过">导出结果验证过</h2>
+<p>导出的文件用 Pillow 反读校验像素，不是&quot;看起来能用&quot;：</p>
+<ul>
+<li>透明图转 JPEG → 透明区确实是白色 (255,255,255)</li>
+<li>大图导 ICO → 自动缩到 256×256（超出多数解析器会拒收）</li>
+<li>自研 BMP → 读出像素与源图逐点一致</li>
+</ul>
+
+      <div class="pager"><a href="../getting-started/"><small>← 上一页</small><b>怎么用</b></a><a style="visibility:hidden"></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

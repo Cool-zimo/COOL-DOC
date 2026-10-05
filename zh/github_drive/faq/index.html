@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>常见问题 · GitHub Drive · COOL-DOC</title>
+<meta name="description" content="单文件大小、仓库上限、跨域、多账号。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/github_drive/faq/">中</a><a class="" href="../../../en/github_drive/faq/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="" href="../../../al/">AnyLearn · 通学万义</a><a class="on" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#单个文件能多大" style="padding-left:10px;font-size:13px">单个文件能多大？</a><a href="#能装多少东西" style="padding-left:10px;font-size:13px">能装多少东西？</a><a href="#为什么有时候要开后端" style="padding-left:10px;font-size:13px">为什么有时候要开后端？</a><a href="#支持多账号吗" style="padding-left:10px;font-size:13px">支持多账号吗？</a><a href="#插件数据存在哪" style="padding-left:10px;font-size:13px">插件数据存在哪？</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">GitHub Drive</a><span>/</span>常见问题</div>
+    <article class="doc">
+      <h1>常见问题</h1>
+      <p class="lead">单文件大小、仓库上限、跨域、多账号。</p>
+      <h2 id="单个文件能多大">单个文件能多大？</h2>
+<p>GitHub 对单个文件有 <strong>100MB</strong> 限制。超过的文件会自动分片，
+存到多个仓库，读取时再拼回来。这个过程是透明的。</p>
+<h2 id="能装多少东西">能装多少东西？</h2>
+<p>取决于你的 GitHub 账号配额。免费账号仓库总量没有硬性上限，
+但单个仓库建议控制在 1GB 以内 —— 超过之后 Git 操作会明显变慢。</p>
+<h2 id="为什么有时候要开后端">为什么有时候要开后端？</h2>
+<p>浏览器直连 GitHub API 有跨域限制，部分场景（比如某些企业网络）
+会失败。这时可以跑
+<a href="https://github.com/Cool-zimo/github-drive-server">本地服务端</a>，
+它做 CORS 代理、B 站视频解析、命令执行。</p>
+<h2 id="支持多账号吗">支持多账号吗？</h2>
+<p>支持。侧边栏可以切换多个 GitHub 账号，每个账号的 token 独立保存。</p>
+<h2 id="插件数据存在哪">插件数据存在哪？</h2>
+<p>插件 HTML 存在浏览器 localStorage。换设备不会同步 ——
+插件本身的数据由插件自己决定存在哪。</p>
+
+      <div class="pager"><a href="../plugin-development/"><small>← 上一页</small><b>插件开发</b></a><a style="visibility:hidden"></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

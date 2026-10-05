@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How to use · CoverFit · COOL-DOC</title>
+<meta name="description" content="Drop an image, pick a ratio, export.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/coverfit/getting-started/">中</a><a class="on" href="../../../en/coverfit/getting-started/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="" href="../../../al/">AnyLearn</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="on" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#import" style="padding-left:10px;font-size:13px">Import</a><a href="#crop" style="padding-left:10px;font-size:13px">Crop</a><a href="#formats" style="padding-left:10px;font-size:13px">Formats</a><a href="#size" style="padding-left:10px;font-size:13px">Size</a><a href="#batch" style="padding-left:10px;font-size:13px">Batch</a><a href="#privacy" style="padding-left:10px;font-size:13px">Privacy</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">CoverFit</a><span>/</span>How to use</div>
+    <article class="doc">
+      <h1>How to use</h1>
+      <p class="lead">Drop an image, pick a ratio, export.</p>
+      <p>Open <a href="https://cool-zimo.github.io/coverfit/">CoverFit</a>.</p>
+<h2 id="import">Import</h2>
+<p>Three ways, all supported:</p>
+<ul>
+<li><strong>Drag and drop</strong> (multiple files)</li>
+<li><strong>Click to choose</strong> files</li>
+<li><strong>Ctrl+V</strong> to paste from the clipboard</li>
+</ul>
+<h2 id="crop">Crop</h2>
+<p>11 preset ratios:</p>
+<table>
+<thead>
+<tr>
+  <th>Ratio</th>
+  <th>Typical use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>1:1</td>
+  <td>Avatar</td>
+</tr>
+<tr>
+  <td>16:9</td>
+  <td>Video thumbnail</td>
+</tr>
+<tr>
+  <td>3:4</td>
+  <td>Xiaohongshu</td>
+</tr>
+<tr>
+  <td>2.35:1</td>
+  <td>WeChat cover</td>
+</tr>
+<tr>
+  <td>1.91:1</td>
+  <td>Share card</td>
+</tr>
+</tbody>
+</table>
+<p>Custom ratios work too. The crop box can be dragged and resized; locking the ratio
+makes the other side follow.</p>
+<h2 id="formats">Formats</h2>
+<p>PNG / JPEG / WebP / GIF / BMP / ICO / AVIF.</p>
+<div class="tip tip-note">
+<b>Transparent → JPEG becomes white, not black</b>
+<p>JPEG has no alpha channel, so a background colour must be filled in. Filling black
+makes logo edges look dirty, so white is used instead.</p>
+</div>
+
+<h2 id="size">Size</h2>
+<p>Original / ≤4096 / ≤2048 / ≤1200 / ≤800 / custom width.</p>
+<h2 id="batch">Batch</h2>
+<p>Drop several images at once; each keeps its own crop box, and you can export all in
+one click.</p>
+<h2 id="privacy">Privacy</h2>
+<p>Images are <strong>never uploaded</strong>. Everything happens in your browser via Canvas, so it
+works offline too.</p>
+
+      <div class="pager"><a style="visibility:hidden"></a><a class="next" href="../under-the-hood/"><small>Next →</small><b>Under the hood</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

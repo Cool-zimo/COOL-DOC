@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>使用技巧 · 仓鼠 Cangshu · COOL-DOC</title>
+<meta name="description" content="几个能省时间的用法。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/cangshu/tips/">中</a><a class="" href="../../../en/cangshu/tips/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="" href="../../../al/">AnyLearn · 通学万义</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="on" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#按-pages-状态筛选" style="padding-left:10px;font-size:13px">按 Pages 状态筛选</a><a href="#快速定位刚推过的仓库" style="padding-left:10px;font-size:13px">快速定位刚推过的仓库</a><a href="#和-drive-配合" style="padding-left:10px;font-size:13px">和 Drive 配合</a><a href="#归档不用的仓库" style="padding-left:10px;font-size:13px">归档不用的仓库</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">仓鼠 Cangshu</a><span>/</span>使用技巧</div>
+    <article class="doc">
+      <h1>使用技巧</h1>
+      <p class="lead">几个能省时间的用法。</p>
+      <h2 id="按-pages-状态筛选">按 Pages 状态筛选</h2>
+<p>想知道哪个仓库的 Pages 挂了、哪个还没开，直接筛。</p>
+<h2 id="快速定位刚推过的仓库">快速定位刚推过的仓库</h2>
+<p>卡片上的 commit hash 是最新的。刚推完来这里看一眼，
+比在 GitHub 上翻列表快。</p>
+<h2 id="和-drive-配合">和 Drive 配合</h2>
+<ul>
+<li>Drive 存文件 → 仓鼠管仓库</li>
+<li>两边侧边栏底部都有一键跳转</li>
+</ul>
+<h2 id="归档不用的仓库">归档不用的仓库</h2>
+<p>比起删除，<strong>归档（archive）</strong> 更安全：只读，历史全留着，
+页面上会有归档标记，不会误操作。</p>
+
+      <div class="pager"><a href="../getting-started/"><small>← 上一页</small><b>快速开始</b></a><a style="visibility:hidden"></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

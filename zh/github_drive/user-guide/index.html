@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>用户指南 · GitHub Drive · COOL-DOC</title>
+<meta name="description" content="视图、多选、收藏、分享、插件、清理仓库。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/github_drive/user-guide/">中</a><a class="" href="../../../en/github_drive/user-guide/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="" href="../../../al/">AnyLearn · 通学万义</a><a class="on" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#文件管理" style="padding-left:10px;font-size:13px">文件管理</a><a href="#视图切换" style="padding-left:24px;font-size:12.5px">视图切换</a><a href="#多选操作" style="padding-left:24px;font-size:12.5px">多选操作</a><a href="#拖拽移动" style="padding-left:24px;font-size:12.5px">拖拽移动</a><a href="#路径导航" style="padding-left:24px;font-size:12.5px">路径导航</a><a href="#收藏与最近使用" style="padding-left:10px;font-size:13px">收藏与最近使用</a><a href="#分享" style="padding-left:10px;font-size:13px">分享</a><a href="#创建分享" style="padding-left:24px;font-size:12.5px">创建分享</a><a href="#我的分享" style="padding-left:24px;font-size:12.5px">我的分享</a><a href="#发现分享" style="padding-left:24px;font-size:12.5px">发现分享</a><a href="#插件" style="padding-left:10px;font-size:13px">插件</a><a href="#安装与运行" style="padding-left:24px;font-size:12.5px">安装与运行</a><a href="#管理" style="padding-left:24px;font-size:12.5px">管理</a><a href="#设置与维护" style="padding-left:10px;font-size:13px">设置与维护</a><a href="#清理仓库历史" style="padding-left:24px;font-size:12.5px">清理仓库历史</a><a href="#退出登录" style="padding-left:24px;font-size:12.5px">退出登录</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">GitHub Drive</a><span>/</span>用户指南</div>
+    <article class="doc">
+      <h1>用户指南</h1>
+      <p class="lead">视图、多选、收藏、分享、插件、清理仓库。</p>
+      <h2 id="文件管理">文件管理</h2>
+<h3 id="视图切换">视图切换</h3>
+<p>工具栏 ▦/☰ 切换网格视图和列表视图，偏好自动保存。</p>
+<h3 id="多选操作">多选操作</h3>
+<ul>
+<li>按住 Ctrl/Cmd 点击文件，切换选中</li>
+<li>选中多个后右键任意一个，可批量：删除、移动、复制、收藏、下载、分享</li>
+</ul>
+<h3 id="拖拽移动">拖拽移动</h3>
+<ul>
+<li>拖到当前目录的文件夹上 → 移进去</li>
+<li>拖到顶部面包屑的任意一级 → 移到对应目录</li>
+<li>拖到「Drive Home」→ 移到根目录</li>
+</ul>
+<h3 id="路径导航">路径导航</h3>
+<p>顶部面包屑显示当前路径，点任意一级跳转。路径过长可横向滚动。</p>
+<h2 id="收藏与最近使用">收藏与最近使用</h2>
+<ul>
+<li>右键 → 收藏 / 取消收藏</li>
+<li>侧边栏「⭐ 收藏」看所有收藏（含文件夹）</li>
+<li>侧边栏「🕐 最近使用」看最近打开的文件</li>
+</ul>
+<h2 id="分享">分享</h2>
+<h3 id="创建分享">创建分享</h3>
+<ol>
+<li>右键文件（可多选）→ 分享</li>
+<li>填名称和描述</li>
+<li>自动创建 <code>gd-share-{名称}-{时间戳}</code> 格式的公开仓库</li>
+<li>启用 GitHub Pages，生成分享链接</li>
+</ol>
+<p>创建过程有<strong>进度窗口</strong>，五步：
+创建仓库 → 复制文件 → 上传 → 启用 Pages → 完成。每步三态：待办 / 进行中 / 已完成。</p>
+<h3 id="我的分享">我的分享</h3>
+<p>侧边栏「📤 我的分享」看自己创建的所有分享。</p>
+<div class="tip tip-note">
+<b>列表直接从 GitHub 读</b>
+<p>扫描你账号下 <code>gd-share-*</code> 仓库，不是读浏览器本地记录 ——
+换设备、清缓存后依然看得到。每条带「云端」徽章，显示真实体积，可一键删仓库。</p>
+</div>
+
+<h3 id="发现分享">发现分享</h3>
+<ul>
+<li>侧边栏「🌐 发现分享」</li>
+<li>自动搜索所有 <code>gd-share-</code> 开头的公开仓库</li>
+<li>校验标准分享格式（share.json）</li>
+<li>卡片显示作者、简介、文件数，一键跳转</li>
+</ul>
+<h2 id="插件">插件</h2>
+<h3 id="安装与运行">安装与运行</h3>
+<ol>
+<li>侧边栏「🧩 插件广场」</li>
+<li>点「⬇️ 安装」</li>
+<li>点「▶️ 运行」—— 全屏打开</li>
+</ol>
+<p>顶部工具条显示插件名与版本，按 ESC 或「✕」退出。可同时开多个插件。</p>
+<h3 id="管理">管理</h3>
+<p>已安装的显示「已安装」标签，点「🗑️ 卸载」移除。插件 HTML 存在浏览器 localStorage。</p>
+<h2 id="设置与维护">设置与维护</h2>
+<h3 id="清理仓库历史">清理仓库历史</h3>
+<p>大文件反复修改会让 Git 仓库膨胀。仓库已配 GitHub Actions，每周日自动压缩历史。
+也可手动：仓库 → Actions → 「清理仓库历史」→ Run workflow。</p>
+<h3 id="退出登录">退出登录</h3>
+<p>侧边栏底部「退出登录」，清掉本地 Token 和所有数据。</p>
+
+      <div class="pager"><a href="../getting-started/"><small>← 上一页</small><b>快速开始</b></a><a class="next" href="../plugin-development/"><small>下一页 →</small><b>插件开发</b></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

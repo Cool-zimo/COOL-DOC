@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>介绍 · Python 从零到进阶 · COOL-DOC</title>
+<meta name="description" content="和 AnyLearn 什么关系、适合谁。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="on" href="../../../zh/python-tutorial/index/">中</a><a class="" href="../../../en/python-tutorial/index/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 返回文档首页</a><div class="app-t">全部项目</div><a class="" href="../../../al/">AnyLearn · 通学万义</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">仓鼠 Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="on" href="../../../python-tutorial/">Python 从零到进阶</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">其它工具</a><div class="app-t">本页目录</div><a href="#和-anylearn-的区别" style="padding-left:10px;font-size:13px">和 AnyLearn 的区别</a><a href="#共同点" style="padding-left:10px;font-size:13px">共同点</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">Python 从零到进阶</a><span>/</span>介绍</div>
+    <article class="doc">
+      <h1>介绍</h1>
+      <p class="lead">和 AnyLearn 什么关系、适合谁。</p>
+      <p>打开 <a href="https://cool-zimo.github.io/python-tutorial/">Python 从零到进阶</a>。</p>
+<p>这是 AnyLearn 的<strong>中文单本站</strong> —— 内容集中在 Python 入门这一条线上，
+不像 AnyLearn 那样有 25 本教材。</p>
+<h2 id="和-anylearn-的区别">和 AnyLearn 的区别</h2>
+<table>
+<thead>
+<tr>
+  <th></th>
+  <th>本站</th>
+  <th>AnyLearn</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>教材数</td>
+  <td>1 本</td>
+  <td>25 本</td>
+</tr>
+<tr>
+  <td>语言</td>
+  <td>中文</td>
+  <td>中英双语</td>
+</tr>
+<tr>
+  <td>第三方教材</td>
+  <td>无</td>
+  <td>有</td>
+</tr>
+<tr>
+  <td>复习调度</td>
+  <td>有</td>
+  <td>有</td>
+</tr>
+</tbody>
+</table>
+<p>如果你只想学 Python 基础，这个站更轻。
+想看更多方向（算法、网页、数据分析、标准库）或者想自己写教材，用 AnyLearn。</p>
+<h2 id="共同点">共同点</h2>
+<ul>
+<li>代码在浏览器里真跑（Pyodide）</li>
+<li>笔记同步到你的私有仓库</li>
+<li>艾宾浩斯复习调度</li>
+</ul>
+
+      
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

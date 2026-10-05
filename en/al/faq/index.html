@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FAQ · AnyLearn · COOL-DOC</title>
+<meta name="description" content="Sign-in, rate limits, search, and missing books.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
+<link rel="stylesheet" href="../../../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="mbtn" aria-label="menu">☰</button>
+  <a class="brand" href="../../../"><span class="lg">📚</span>COOL-DOC<small>Docs for every Cool-zimo project</small></a>
+  <div class="top-sp"></div>
+  <div class="lang"><a class="" href="../../../zh/al/faq/">中</a><a class="on" href="../../../en/al/faq/">EN</a></div>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+  <nav class="side" id="side"><a class="home" href="../../../">🏠 Back to docs home</a><div class="app-t">All projects</div><a class="on" href="../../../al/">AnyLearn</a><a class="" href="../../../github_drive/">GitHub Drive</a><a class="" href="../../../cangshu/">Cangshu</a><a class="" href="../../../coverfit/">CoverFit</a><a class="" href="../../../python-tutorial/">Python from zero</a><a class="" href="../../../tiny-md/">tiny-md</a><a class="" href="../../../more/">Other tools</a><div class="app-t">On this page</div><a href="#do-i-have-to-sign-in" style="padding-left:10px;font-size:13px">Do I have to sign in?</a><a href="#is-the-token-safe" style="padding-left:10px;font-size:13px">Is the token safe?</a><a href="#why-did-refreshing-used-to-hang-on-the-sign-in-page" style="padding-left:10px;font-size:13px">Why did refreshing used to hang on the sign-in page?</a><a href="#what-does-search-cover" style="padding-left:10px;font-size:13px">What does search cover?</a><a href="#my-third-party-book-was-published-but-cant-be-found" style="padding-left:10px;font-size:13px">My third-party book was published but can&#x27;t be found?</a><a href="#how-many-lessons-can-a-book-have" style="padding-left:10px;font-size:13px">How many lessons can a book have?</a><a href="#can-i-write-a-novel-instead" style="padding-left:10px;font-size:13px">Can I write a novel instead?</a></nav>
+  <main class="main">
+    <div class="crumb"><a href="../../../">COOL-DOC</a><span>/</span>
+      <a href="../">AnyLearn</a><span>/</span>FAQ</div>
+    <article class="doc">
+      <h1>FAQ</h1>
+      <p class="lead">Sign-in, rate limits, search, and missing books.</p>
+      <h2 id="do-i-have-to-sign-in">Do I have to sign in?</h2>
+<p>Not for official textbooks. But <strong>third-party books are found by searching GitHub with
+your token</strong>.</p>
+<p>The unauthenticated API gives 60 requests/hour, which one search plus a few
+<code>albook.json</code> fetches will nearly exhaust. Signed in: 5,000/hour, plus the real-time
+API path (0.57s) instead of waiting on CDN cache.</p>
+<h2 id="is-the-token-safe">Is the token safe?</h2>
+<p>It's written to browser localStorage and never sent out. This site is static — there's
+no backend that could receive it.</p>
+<p>Use a <strong>fine-grained token</strong> with only <code>Contents: Read and write</code>, 90-day expiry.</p>
+<h2 id="why-did-refreshing-used-to-hang-on-the-sign-in-page">Why did refreshing used to hang on the sign-in page?</h2>
+<p>The old flow was &quot;verify over the network before letting you in&quot;, so every refresh
+waited on a round trip to GitHub.</p>
+<p>Now: <strong>if a local token exists you go straight in</strong>, username and avatar come from
+cache, verification happens quietly in the background. You only get bounced to sign-in
+if it's genuinely invalid; if the network is down you just get a banner, not a logout.</p>
+<h2 id="what-does-search-cover">What does search cover?</h2>
+<p><strong>Titles and tables of contents</strong> (chapter and lesson titles). Not body text.</p>
+<p>That's deliberate: the index shrank from 1.7MB to 176KB, so results are instant with
+no background full-text fetch. The cost is that a term appearing only in body text
+won't be found.</p>
+<h2 id="my-third-party-book-was-published-but-cant-be-found">My third-party book was published but can't be found?</h2>
+<p>See the section in <a href="../publish/">Review &amp; publish</a>. The most common cause is <strong>failed
+validation</strong> — if the review report has errors, the bot won't index it.</p>
+<h2 id="how-many-lessons-can-a-book-have">How many lessons can a book have?</h2>
+<p>No hard limit. Content is organised by chapter, and a chapter can hold any number.</p>
+<h2 id="can-i-write-a-novel-instead">Can I write a novel instead?</h2>
+<p>Yes. Set <code>&quot;kind&quot;: &quot;novel&quot;</code> in <code>albook.json</code> and question counts aren't enforced.</p>
+<p>But any question you do include must be gradeable — validity is still checked.</p>
+
+      <div class="pager"><a href="../publish/"><small>← Previous</small><b>Review &amp; publish</b></a><a style="visibility:hidden"></a></div>
+    </article>
+  </main>
+</div>
+<footer>
+  COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a> ·
+  <a href="https://cool-zimo.github.io/">作者主页</a>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('mbtn'),s=document.getElementById('side'),
+      c=document.getElementById('scrim');
+  function close(){s.classList.remove('on');c.classList.remove('on');}
+  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
+  c.onclick=close;
+  s.addEventListener('click',function(e){
+    if(e.target.tagName==='A'&&innerWidth<900) close(); });
+})();
+</script>
+</body>
+</html>

@@ -1,41 +1,76 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="zh-CN"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>COOL-DOC · Cool-zimo 全部项目的文档</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📚</text></svg>">
-<link rel="stylesheet" href="assets/style.css">
-</head>
+<style>
+:root{--v:#7c5cff;--c:#22d3ee;--bg:#0a0b12;--panel:#14161f;--line:#262a38;--ink:#eaecf4;--dim:#9aa3b8;--dim2:#7b8499}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:32px 22px;position:relative;overflow-x:hidden;
+  font:15px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+body::before,body::after{content:"";position:fixed;border-radius:50%;filter:blur(100px);z-index:0;pointer-events:none}
+body::before{width:520px;height:520px;left:-140px;top:-160px;background:radial-gradient(circle,rgba(124,92,255,.28),transparent 68%)}
+body::after{width:440px;height:440px;right:-120px;bottom:-140px;background:radial-gradient(circle,rgba(34,211,238,.2),transparent 68%)}
+.wrap{position:relative;z-index:1;max-width:520px;width:100%;text-align:center}
+.logo{width:74px;height:74px;margin:0 auto 18px;border-radius:21px;display:grid;place-items:center;font-size:38px;
+  background:linear-gradient(135deg,rgba(124,92,255,.2),rgba(34,211,238,.2));border:1px solid var(--line);
+  box-shadow:0 18px 44px -18px rgba(124,92,255,.7);animation:fl 5s ease-in-out infinite}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+h1{font-size:32px;font-weight:750;letter-spacing:-.02em}
+.sub{margin-top:6px;font-size:14px;color:var(--dim)}
+.desc{margin-top:12px;font-size:13px;color:var(--dim2);line-height:1.75}
+.picks{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:30px}
+.pick{display:block;padding:20px 16px;border-radius:16px;background:var(--panel);border:1px solid var(--line);
+  color:inherit;transition:.22s cubic-bezier(.22,.9,.3,1);position:relative;overflow:hidden}
+.pick::before{content:"";position:absolute;inset:0;opacity:0;transition:.22s;
+  background:linear-gradient(135deg,rgba(124,92,255,.1),rgba(34,211,238,.1))}
+.pick:hover{transform:translateY(-4px);border-color:#39425a;box-shadow:0 16px 34px -16px rgba(0,0,0,.8);text-decoration:none}
+.pick:hover::before{opacity:1}
+.pick .fl2{font-size:25px;display:block;margin-bottom:8px;position:relative}
+.pick b{display:block;font-size:16px;font-weight:650;position:relative}
+.pick span{font-size:12px;color:var(--dim2);position:relative}
+.auto{margin-top:20px;font-size:12.5px;color:var(--dim2);min-height:20px}
+.auto b{color:#a78bfa}
+.auto button{background:none;border:1px solid var(--line);color:var(--dim);font:inherit;font-size:11.5px;
+  padding:3px 11px;border-radius:8px;margin-left:7px;cursor:pointer}
+.auto button:hover{border-color:var(--v);color:#a78bfa}
+.foot{margin-top:28px;font-size:11.5px;color:#4d566b}
+.foot a{color:var(--dim2)}
+@media(max-width:520px){.picks{grid-template-columns:1fr}h1{font-size:26px}}
+@media(prefers-reduced-motion:reduce){.logo{animation:none}.pick:hover{transform:none}}
+</style></head>
 <body>
-<header class="top">
-  <button class="menu-btn" id="mbtn">☰</button>
-  <a class="brand" href=""><span class="lg">📚</span>COOL-DOC<small>Cool-zimo 全部项目的文档</small></a>
-  <div class="top-sp"></div>
-  
-</header>
-<div class="scrim" id="scrim"></div>
 <div class="wrap">
-  <nav class="side" id="side">
-    <a class="home" href="">🏠 首页</a>
-    <div class="app-t">全部项目</div>
-    <a href="al/">AnyLearn</a><a href="github_drive/">GitHub Drive</a>
-  </nav>
-  <main class="main">
-    <article class="doc">
-      <h1>COOL-DOC</h1>
-      <p class="lead">Cool-zimo 全部项目的文档</p>
-      <div class="cards"><a class="card" href="al/"><b>AnyLearn</b><span>浏览器里真跑代码的编程教程，会记笔记、按艾宾浩斯曲线安排复习。</span><span class="go">进入 →</span></a><a class="card" href="github_drive/"><b>GitHub Drive</b><span>用仓库存文件、分片上传、一键分享、插件扩展的虚拟文件系统。</span><span class="go">进入 →</span></a></div>
-    </article>
-  </main>
+  <div class="logo">📚</div>
+  <h1>COOL-DOC</h1>
+  <div class="sub">Cool-zimo 全部项目的文档</div>
+  <p class="desc">一个应用一个目录 · 中英双语 · 链接形如
+    <code style="font-family:monospace;font-size:12px">COOL-DOC/al/文档名</code></p>
+  <div class="picks">
+    <a class="pick" href="zh/"><span class="fl2">🇨🇳</span><b>中文</b><span>中文文档</span></a>
+    <a class="pick" href="en/"><span class="fl2">🌐</span><b>English</b><span>English docs</span></a>
+  </div>
+  <div class="auto" id="auto"></div>
+  <div class="foot"><a href="https://github.com/Cool-zimo/COOL-DOC">源码</a> ·
+    <a href="https://cool-zimo.github.io/">作者主页</a></div>
 </div>
-<footer>COOL-DOC · <a href="https://github.com/Cool-zimo/COOL-DOC">GitHub</a></footer>
 <script>
 (function(){
-  var b=document.getElementById('mbtn'),s=document.getElementById('side'),c=document.getElementById('scrim');
-  function close(){s.classList.remove('on');c.classList.remove('on');}
-  b.onclick=function(){var on=s.classList.toggle('on');c.classList.toggle('on',on);};
-  c.onclick=close;
-  s.addEventListener('click',function(e){if(e.target.tagName==='A'&&innerWidth<900)close();});
+  var box=document.getElementById('auto'); if(!box) return;
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches){
+    box.textContent='选择一种语言'; return; }
+  var ls=(navigator.languages||[navigator.language||'']).join(',').toLowerCase();
+  var zh=/^zh/.test(ls)||ls.indexOf(',zh')>-1||ls.indexOf('zh-')>-1;
+  var dest=zh?'zh/':'en/', name=zh?'中文':'English', left=4, t;
+  function draw(){
+    box.innerHTML='将在 <b>'+left+'</b> 秒后进入'+name+'<button type="button" id="c">取消</button>';
+    var b=document.getElementById('c');
+    if(b) b.onclick=function(){clearInterval(t); box.textContent='已取消';};
+  }
+  draw();
+  t=setInterval(function(){ left--;
+    if(left<=0){clearInterval(t);box.textContent='正在进入'+name+'…';location.href=dest;return;} draw(); },1000);
 })();
 </script>
 </body></html>
